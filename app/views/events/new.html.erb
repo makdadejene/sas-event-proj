@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create an Event</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #8b8b7a 0%, #c9c5b8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(80, 80, 70, 0.95);
+            border-radius: 40px;
+            padding: 60px;
+            width: 100%;
+            max-width: 1400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: white;
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 50px;
+            font-weight: 700;
+        }
+
+        .form-container {
+            background: rgba(60, 60, 55, 0.9);
+            border-radius: 30px;
+            padding: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        label {
+            color: white;
+            font-size: 32px;
+            font-weight: 500;
+            min-width: 200px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            background: rgba(40, 40, 38, 0.95);
+            border: none;
+            border-radius: 15px;
+            padding: 20px 25px;
+            color: white;
+            font-size: 18px;
+            flex: 1;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        textarea:focus {
+            background: rgba(50, 50, 48, 0.95);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .date-time-group {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .date-time-group input {
+            flex: 1;
+        }
+
+        .upload-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .upload-box {
+            background: rgba(40, 40, 38, 0.95);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-box:hover {
+            background: rgba(50, 50, 48, 0.95);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Style for date and time inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #6b6b5a 0%, #8b8b7a 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 20px 60px;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="close-btn" onclick="window.location.href='/'">×</button>
+        <h1>Create an event</h1>
+        
+        <div class="form-container">
+            <form>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date">
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Time</label>
+                    <input type="time" id="time" name="time">
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input type="text" id="tags" name="tags">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+
+                <div class="form-group upload-container">
+                    <label for="image">Upload Image</label>
+                    <label for="image" class="upload-box">
+                        <svg class="upload-icon" viewBox="0 0 24 24">
+                            <path d="M12 4v12m0-12l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+
+                <div class="button-container">
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

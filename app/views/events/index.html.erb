@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Events</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #8b8b7a 0%, #c9c5b8 100%);
+            min-height: 100vh;
+            padding: 40px 20px 100px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        h1 {
+            color: white;
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .filters-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .filters-btn {
+            background: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .filters-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dropdown-item.selected {
+            background: rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(650px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .event-card {
+            background: rgba(60, 60, 55, 0.9);
+            border-radius: 30px;
+            padding: 40px;
+            display: flex;
+            gap: 30px;
+            transition: transform 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-info {
+            flex: 1;
+            color: white;
+        }
+
+        .event-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .event-description {
+            font-size: 20px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .event-date, .event-time {
+            font-size: 20px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .event-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(40, 40, 38, 0.95);
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .event-image {
+            width: 250px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+            flex-shrink: 0;
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 50%;
+            transform: translateX(50%);
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 40px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-btn:hover {
+            transform: translateX(50%) scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card {
+                flex-direction: column;
+            }
+
+            .event-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>All Events</h1>
+            <div class="filters-container">
+                <button class="filters-btn" onclick="toggleDropdown()">
+                    Filters
+                    <span>▼</span>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item selected" onclick="sortEvents('default')">Default</div>
+                    <div class="dropdown-item" onclick="sortEvents('alphabetical')">Alphabetically (A-Z)</div>
+                    <div class="dropdown-item" onclick="sortEvents('date')">By Date (Earliest First)</div>
+                    <div class="dropdown-item" onclick="sortEvents('date-desc')">By Date (Latest First)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="events-grid" id="eventsGrid"></div>
+    </div>
+
+    <a href="/events/new" class="add-btn" style="text-decoration: none; color: inherit;">+</a>
+
+    <script>
+        // Fake JSON data for events
+        const eventsData = [
+            {
+                id: 1,
+                title: "Team Building Workshop",
+                description: "Join us for an exciting team building experience",
+                date: "2025-11-15",
+                dateDisplay: "Nov 15, 2025",
+                time: "2:00 PM",
+                tags: ["Team", "Workshop"],
+                image: "https://via.placeholder.com/400x300/4a5568/ffffff?text=Team+Building"
+            },
+            {
+                id: 2,
+                title: "Sports Tournament",
+                description: "Annual company sports competition",
+                date: "2025-11-20",
+                dateDisplay: "Nov 20, 2025",
+                time: "10:00 AM",
+                tags: ["Sports", "Competition"],
+                image: "https://via.placeholder.com/400x300/2563eb/ffffff?text=Sports+Event"
+            },
+            {
+                id: 3,
+                title: "Holiday Party",
+                description: "Celebrate the season with food and fun",
+                date: "2025-12-15",
+                dateDisplay: "Dec 15, 2025",
+                time: "6:00 PM",
+                tags: ["Social", "Party"],
+                image: "https://via.placeholder.com/400x300/dc2626/ffffff?text=Holiday+Party"
+            },
+            {
+                id: 4,
+                title: "Tech Conference",
+                description: "Latest trends in technology and innovation",
+                date: "2026-01-10",
+                dateDisplay: "Jan 10, 2026",
+                time: "9:00 AM",
+                tags: ["Tech", "Conference"],
+                image: "https://via.placeholder.com/400x300/059669/ffffff?text=Tech+Conference"
+            },
+            {
+                id: 5,
+                title: "Art Exhibition",
+                description: "Showcase of contemporary art pieces",
+                date: "2025-11-25",
+                dateDisplay: "Nov 25, 2025",
+                time: "5:00 PM",
+                tags: ["Art", "Culture"],
+                image: "https://via.placeholder.com/400x300/7c3aed/ffffff?text=Art+Exhibition"
+            },
+            {
+                id: 6,
+                title: "Networking Mixer",
+                description: "Connect with professionals in your industry",
+                date: "2025-12-01",
+                dateDisplay: "Dec 1, 2025",
+                time: "7:00 PM",
+                tags: ["Networking", "Business"],
+                image: "https://via.placeholder.com/400x300/ea580c/ffffff?text=Networking"
+            }
+        ];
+
+        // Toggle dropdown menu
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const button = document.querySelector('.filters-btn');
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Placeholder function for sorting - to be implemented in backend
+        function sortEvents(type) {
+            // Update selected state in dropdown
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Note: Actual sorting will be handled by the backend
+            console.log('Sorting by:', type);
+            toggleDropdown();
+        }
+
+        // Function to render event cards
+        function renderEvents(events) {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+
+            events.forEach(event => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                
+                card.innerHTML = `
+                    <div class="event-info">
+                        <h2 class="event-title">${event.title}</h2>
+                        <p class="event-description">${event.description}</p>
+                        <p class="event-date">${event.dateDisplay}</p>
+                        <p class="event-time">${event.time}</p>
+                        <div class="event-tags">
+                            ${event.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <img src="${event.image}" alt="${event.title}" class="event-image">
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Render events on page load
+        renderEvents(eventsData);
+    </script>
+</body>
+</html>
