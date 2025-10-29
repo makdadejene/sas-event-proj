@@ -13,6 +13,40 @@
 # it.
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+# spec/spec_helper.rb  (very top of file)
+if ENV['COVERAGE']
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    track_files 'app/**/*.rb'   # includes files not hit by tests yet
+
+    add_filter '/bin/'
+    add_filter '/db/'
+    add_filter '/spec/'
+    add_filter '/test/'
+    add_filter '/config/'
+    add_filter '/vendor/'
+
+    add_group 'Controllers', 'app/controllers'
+    add_group 'Models',      'app/models'
+    add_group 'Helpers',     'app/helpers'
+    add_group 'Views',       'app/views'
+    add_group 'Mailers',     'app/mailers'
+    add_group 'Jobs',        'app/jobs'
+    add_group 'Channels',    'app/channels'
+
+    minimum_coverage 90
+    minimum_coverage_by_file 80
+  end
+
+  SimpleCov.at_exit do
+    SimpleCov.result.format!
+    pct = SimpleCov.result.covered_percent.round(2)
+    req = SimpleCov.minimum_coverage
+    puts "\n\nCOVERAGE #{pct}% \n"
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

@@ -1,32 +1,79 @@
-Feature: Browse and add events
+# features/core_events.feature
+Feature: Core Event Management
   As a student
-  I want to browse and add events
-  So that I can see what events are available and create new ones
+  I want to manage campus events
+  So that I can stay connected with campus activities
 
-  Background: events exist in the database
+  Background: Sample events exist
     Given the following events exist:
-      | title                     | description                                                                                 | date       | time  | tags           |
-      | Midnight Movie Marathon    | Snacks, comfy seats, and back-to-back movies all night long in the Student Lounge.         | 2025-11-05 | 23:00 | Club, Social   |
-      | Campus Soccer Pickup Game  | Come kick around with fellow students on the North Field! No experience needed, just fun vibes. | 2025-11-06 | 16:00 | Sports, Other  |
-      | Student Potluck Dinner     | Bring your favorite dish and sample treats from everyone else in the Dorm Lounge.          | 2025-11-08 | 18:30 | Cultural, Other|
+      | title                     | description                  | date       | time  | tags           |
+      | Soccer Game               | Fun pickup game              | 2025-11-06 | 16:00 | Sports, Other  |
+      | Movie Night               | Watch movies together        | 2025-11-05 | 23:00 | Club, Social   |
+      | Yoga Session              | Morning yoga                 | 2025-11-16 | 08:30 | Sports, Other  |
 
-  Scenario: Browse all events
+  Scenario: View all events on the homepage
     When I visit the events index page
-    Then I should see "Midnight Movie Marathon"
-    And I should see "Campus Soccer Pickup Game"
-    And I should see "Student Potluck Dinner"
+    Then I should see "Soccer Game"
+    And I should see "Movie Night"
+    And I should see "Yoga Session"
 
-  Scenario: Add a new event
+  Scenario: Events display their details
+    When I visit the events index page
+    Then I should see "Soccer Game"
+    And I should see "Fun pickup game"
+    And I should see "Nov 06, 2025"
+    And I should see "16:00"
+
+  Scenario: Navigate to create event page
+    When I visit the events index page
+    And I click on the add event button
+    Then I should be on the new event page
+    And I should see "Create an event"
+
+  Scenario: Successfully create a new event
     Given I am on the new event page
-    When I fill in "Title" with "K-Pop Dance Practice"
-    And I fill in "Description" with "Join our dance club in Dance Studio 2 to learn popular K-Pop routines—fun, energetic, and no pressure!"
-    And I fill in "Date" with "2025-11-10"
+    When I fill in "Title" with "Dance Workshop"
+    And I fill in "Description" with "Learn new moves"
+    And I fill in "Date" with "2025-11-20"
     And I fill in "Time" with "19:00"
     And I fill in "Tags" with "Club, Cultural"
     And I press "Submit"
-    Then I should see "K-Pop Dance Practice"
+    Then I should see "Dance Workshop"
+    And I should see "Learn new moves"
 
-  Scenario: Browse events sorted alphabetically
+  Scenario: Sort events alphabetically
     When I visit the events page with sort option "alphabetical"
-    Then I should see "Campus Soccer Pickup Game" before "Midnight Movie Marathon"
-    And I should see "Midnight Movie Marathon" before "Student Potluck Dinner"
+    Then I should see "Movie Night" before "Soccer Game"
+    And I should see "Soccer Game" before "Yoga Session"
+
+  Scenario: Sort events by earliest date first
+    When I visit the events page with sort option "date"
+    Then I should see "Movie Night" before "Soccer Game"
+    And I should see "Soccer Game" before "Yoga Session"
+
+  Scenario: Sort events by latest date first
+    When I visit the events page with sort option "date-desc"
+    Then I should see "Yoga Session" before "Soccer Game"
+    And I should see "Soccer Game" before "Movie Night"
+
+  Scenario: Events display individual tags
+    When I visit the events index page
+    Then I should see "Sports"
+    And I should see "Club"
+    And I should see "Social"
+
+  Scenario: Create event with minimal information
+    Given I am on the new event page
+    When I fill in "Title" with "Study Session"
+    And I fill in "Date" with "2025-11-25"
+    And I fill in "Time" with "15:00"
+    And I press "Submit"
+    Then I should see "Study Session"
+
+  Scenario: Return to event list after creating event
+    Given I am on the new event page
+    When I fill in "Title" with "Book Club"
+    And I fill in "Date" with "2025-12-01"
+    And I fill in "Time" with "18:00"
+    And I press "Submit"
+    Then I should be on the events index page

@@ -13,10 +13,11 @@ Quad allows students to post and browse campus events. Users can create events w
 
 ## Features
 
-- Browse all events
-- Sort/filter events by date or alphabetically
-- Create new events via a form
-- Add tags to categorize events
+- Browse Events: View all campus events in a visually appealing grid layout
+- Sort & Filter: Sort events alphabetically, by date (earliest/latest first), or by default order
+- Create Events: Simple form to post new events with all relevant details
+- Responsive Design: Modern, gradient-styled interface that works on all devices
+- Event Details: Each event displays title, description, date, time, location, and tags
 
 ## Getting Started
 
@@ -25,7 +26,8 @@ Quad allows students to post and browse campus events. Users can create events w
 - Ruby 3.x
 - Rails 7.x
 - PostgreSQL
-- Node.js and Yarn
+- Node.js
+- Yarn
 
 ### Setup Instructions
 
