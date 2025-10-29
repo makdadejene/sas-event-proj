@@ -1,24 +1,71 @@
-# README
+# Quad
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Team Members
 
-Things you may want to cover:
+- Makda Dejene (msd2214)
+- Marionna Saunders (mvs2147)
+- Kevin Arista Solis(ka2902)
+- Sophie Agbekpenou (saa2255)
 
-* Ruby version
+## Project Overview
 
-* System dependencies
+Quad allows students to post and browse campus events. Users can create events with a title, description, date, time, tags, and optionally an image. Events can be sorted by date or alphabetically.
 
-* Configuration
+## Features
 
-* Database creation
+- Browse all events
+- Sort/filter events by date or alphabetically
+- Create new events via a form
+- Add tags to categorize events
 
-* Database initialization
+## Getting Started
 
-* How to run the test suite
+### Prerequisites
 
-* Services (job queues, cache servers, search engines, etc.)
+- Ruby 3.x
+- Rails 7.x
+- PostgreSQL
+- Node.js and Yarn
 
-* Deployment instructions
+### Setup Instructions
 
-* ...
+1. **Clone the repository:**
+   \`\`\`bash
+   git clone https://github.com/makdadejene/sas-event-proj.git
+   cd sas-event-proj
+   \`\`\`
+
+2. **Install dependencies:**
+   \`\`\`bash
+   bundle install
+   yarn install
+   \`\`\`
+
+3. **Setup the database:**
+   \`\`\`bash
+   rails db:create
+   rails db:migrate
+   rails db:seed
+   \`\`\`
+
+4. **Start the Rails server:**
+   \`\`\`bash
+   rails server
+   \`\`\`
+
+5. **Visit the app:**
+   Open your browser and go to [http://localhost:3000](http://localhost:3000)
+
+### Running Tests
+
+#### RSpec
+
+\`\`\`bash
+bundle exec rspec
+\`\`\`
+
+#### Cucumber
+
+\`\`\`bash
+bundle exec cucumber
+\`\`\`
