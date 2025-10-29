@@ -1,6 +1,17 @@
 class EventsController < ApplicationController
   def index
-    @events = Event.all.order(created_at: :desc)
+    @events = Event.all
+
+    case params[:sort]
+    when "alphabetical"
+      @events = @events.order(:title)
+    when "date"
+      @events = @events.order(:date)
+    when "date-desc"
+      @events = @events.order(date: :desc)
+    else
+      @events = @events.order(:created_at)
+    end
   end
 
   def new
