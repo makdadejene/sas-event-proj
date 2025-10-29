@@ -7,6 +7,15 @@ group :test do
   gem 'simplecov', require: false
 end
 
+group :development, :test do
+  gem 'rspec-rails'
+  gem 'rails-controller-testing'  # Add this line
+end
+
+group :test do
+  gem 'database_cleaner-active_record'
+end
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3"
 

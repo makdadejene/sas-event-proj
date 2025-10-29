@@ -29,11 +29,9 @@ Given("I am on the new event page") do
 end
 
 When("I fill in {string} with {string}") do |field, value|
-  # Handle both label text and Rails field IDs
   begin
     fill_in field, with: value
   rescue Capybara::ElementNotFound
-    # Try Rails default ID format: event_fieldname
     field_id = "event_#{field.downcase.gsub(' ', '_')}"
     fill_in field_id, with: value
   end
@@ -44,7 +42,6 @@ When("I press {string}") do |button_text|
 end
 
 When("I click on the add event button") do
-  # The add button is a link with a plus sign
   find('a.add-btn').click
 end
 
@@ -96,7 +93,6 @@ Then("I should see events with tag {string}") do |tag|
 end
 
 Then("I should see dates in {string} format") do |format|
-  # Check if dates are formatted correctly (e.g., "Nov 05, 2025")
   expect(page).to have_css('.event-date')
   dates = page.all('.event-date').map(&:text)
   dates.each do |date_text|
@@ -105,7 +101,6 @@ Then("I should see dates in {string} format") do |format|
 end
 
 Then("I should see times in {string} format") do |format|
-  # Check if times are formatted correctly (e.g., "23:00")
   expect(page).to have_css('.event-time')
   times = page.all('.event-time').map(&:text)
   times.each do |time_text|

@@ -1,0 +1,20 @@
+<!-- app/views/events/show.html.erb -->
+<div class="event-detail">
+  <h1><%= @event.title %></h1>
+  
+  <div class="event-info">
+    <p><strong>Date:</strong> <%= @event.date.strftime("%b %d, %Y") %></p>
+    <p><strong>Time:</strong> <%= @event.time.strftime("%H:%M") %></p>
+    <% if @event.description.present? %>
+      <p><strong>Description:</strong> <%= @event.description %></p>
+    <% end %>
+    <% if @event.tags.present? %>
+      <p><strong>Tags:</strong> <%= @event.tags %></p>
+    <% end %>
+  </div>
+  
+  <div class="actions">
+    <%= link_to "Edit", edit_event_path(@event), class: "btn" %>
+    <%= link_to "Back to Events", events_path, class: "btn" %>
+  </div>
+</div>
