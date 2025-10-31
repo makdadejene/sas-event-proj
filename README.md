@@ -7,6 +7,10 @@
 - Kevin Arista Solis(ka2902)
 - Sophie Agbekpenou (saa2255)
 
+## Heroku Link
+
+https://quad-events-app-a4f62440aa74.herokuapp.com/
+
 ## Project Overview
 
 Quad allows students to post and browse campus events. Users can create events with a title, description, date, time, tags, and optionally an image. Events can be sorted by date or alphabetically.
