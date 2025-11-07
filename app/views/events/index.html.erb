@@ -42,6 +42,8 @@
             right: 0;
         }
 
+        
+
         .filters-btn {
             background: white;
             border: none;
@@ -160,6 +162,12 @@
             flex-shrink: 0;
         }
 
+        .event-location {
+  font-size: 20px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
         .add-btn {
             position: fixed;
             bottom: 40px;
@@ -227,16 +235,29 @@
                 <h2 class="event-title"><%= event.title %></h2>
                 <p class="event-description"><%= event.description %></p>
                 <p class="event-date"><%= event.date.strftime("%b %d, %Y") %></p>
-                <p class="event-time"><%= event.time.strftime("%H:%M") %></p>
+                <p class="event-time">
+  <% if event.start_time && event.end_time %>
+    <%= event.start_time.strftime("%I:%M %p") %> – <%= event.end_time.strftime("%I:%M %p") %>
+  <% elsif event.start_time %>
+    <%= event.start_time.strftime("%I:%M %p") %>
+  <% end %>
+</p>
+<% if event.location.present? %>
+  <p class="event-location">📍 <%= event.location %></p>
+<% end %>
                 <div class="event-tags">
-                <% event.tags.split(',').each do |tag| %>
-                    <span class="tag"><%= tag.strip %></span>
-                <% end %>
-                </div>
+  <% event.tags.each do |tag| %>
+    <span class="tag"><%= tag %></span>
+  <% end %>
+</div>
             </div>
 
-            <img src="https://spotme.com/wp-content/uploads/2020/07/Hero-1.jpg" 
-                alt="<%= event.title %>" class="event-image">
+            <% if event.image.attached? %>
+  <%= image_tag event.image, class: "event-image" %>
+<% else %>
+  <img src="https://spotme.com/wp-content/uploads/2020/07/Hero-1.jpg"
+       alt="<%= event.title %>" class="event-image">
+<% end %>
         </div>
     <% end %>
     </div>

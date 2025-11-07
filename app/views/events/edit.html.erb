@@ -14,28 +14,46 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :title %>
+    <%= f.label :title, "Title" %>
     <%= f.text_field :title %>
   </div>
 
   <div class="field">
-    <%= f.label :date %>
+    <%= f.label :date, "Date" %>
     <%= f.date_field :date %>
   </div>
 
   <div class="field">
-    <%= f.label :time %>
-    <%= f.time_field :time %>
+    <%= f.label :start_time, "Start Time" %>
+    <%= f.time_field :start_time %>
   </div>
 
   <div class="field">
-    <%= f.label :description %>
+    <%= f.label :end_time, "End Time" %>
+    <%= f.time_field :end_time %>
+  </div>
+
+  <div class="field">
+    <%= f.label :location, "Location" %>
+    <%= f.text_field :location %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Description" %>
     <%= f.text_area :description %>
   </div>
 
   <div class="field">
-    <%= f.label :tags %>
-    <%= f.text_field :tags %>
+    <%= f.label :tags, "Tags" %>
+    <%= f.select :tags, 
+          ["Sports", "Ed", "Social", "Art", "Club", "Other"], 
+          {}, 
+          { multiple: true, class: "form-control large-select" } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :unlisted, "Unlisted?" %>
+    <%= f.check_box :unlisted %>
   </div>
 
   <div class="actions">

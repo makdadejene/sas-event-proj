@@ -1,7 +1,12 @@
 # app/controllers/events_controller.rb
 class EventsController < ApplicationController
   def index
-    @events = Event.all
+    now = Time.current
+
+  @events = Event.where(
+    "date > ? OR (date = ? AND start_time > ?)",
+    now.to_date, now.to_date, now
+  )
     
     case params[:sort]
     when 'alphabetical'
@@ -56,6 +61,15 @@ class EventsController < ApplicationController
   private
 
   def event_params
-    params.require(:event).permit(:title, :date, :time, :description, :tags)
-  end
+  params.require(:event).permit(
+    :title,
+    :date,
+    :start_time,
+    :end_time,
+    :location,
+    :description,
+    :image,
+    tags: []
+  )
+end
 end
