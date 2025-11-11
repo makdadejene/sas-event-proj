@@ -1,0 +1,10 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1 class="title">Sign in to Quad</h1>
+
+    <%= button_to "Continue with Google",
+          user_google_oauth2_omniauth_authorize_path,
+          data: { turbo: false },
+          class: "btn-google" %>
+  </div>
+</div>

@@ -1,5 +1,8 @@
 require_relative "boot"
 
+# 👇 Add this line to load your .env file automatically
+require "dotenv/load"
+
 require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems

@@ -32,6 +32,124 @@
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       }
 
+      .auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8b8b7a 0%, #c9c5b8 100%);
+  color: white;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  background: rgba(50, 50, 45, 0.95);
+  border-radius: 40px;
+  padding: 80px 100px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.title {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #d1d1cc;
+  margin-bottom: 50px;
+}
+
+.btn-google {
+  width: 100%;
+  background: #ffffff;
+  color: #333;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 17px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-google::before {
+  content: "";
+  background: url("https://developers.google.com/identity/images/g-logo.png") no-repeat center;
+  background-size: 22px;
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+}
+
+.btn-google:hover {
+  background: #f3f3f3;
+}
+
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 60px 30px;
+    border-radius: 25px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+}
+
+
+      .top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(40, 40, 38, 0.95);
+  color: white;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 30px;
+  z-index: 1000;
+  font-size: 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.signout-btn {
+  background: #e53935;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.signout-btn:hover {
+  background: #c62828;
+}
+
+
       h1 {
           color: white;
           font-size: 64px;
@@ -216,6 +334,27 @@
   </head>
 
   <body>
+  <header class="top-bar">
+  <% if user_signed_in? %>
+    <div class="user-info">
+      <span>Welcome, <%= current_user.name || current_user.email %></span>
+      <%= button_to "Sign out",
+                    destroy_user_session_path,
+                    method: :delete,
+                    data: { turbo: false },
+                    class: "signout-btn" %>
+    </div>
+  <% else %>
+    <%= link_to "Sign in",
+                new_user_session_path,
+                class: "signout-btn" %>
+  <% end %>
+</header>
+  </header>
+
+  <div class="container">
     <%= yield %>
-  </body>
+  </div>
+</body>
+
 </html>
