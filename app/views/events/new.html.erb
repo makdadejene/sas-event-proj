@@ -30,12 +30,34 @@
     </div>
 
      <div class="form-group">
-  <%= f.label :tags, "Tags" %>
-  <%= f.select :tags,
-      ["Sports", "Ed", "Social", "Art", "Club", "Other"],
-      {},
-      { multiple: false, class: "large-select" } %>
-</div>
+      <%= f.label :tags, "Tags" %>
+      <div style="flex: 1; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'art', false, id: 'tag_art' %>
+          <span style="font-size: 18px;">Art</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'sports', false, id: 'tag_sports' %>
+          <span style="font-size: 18px;">Sports</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'ed', false, id: 'tag_ed' %>
+          <span style="font-size: 18px;">Ed</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'social', false, id: 'tag_social' %>
+          <span style="font-size: 18px;">Social</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'club', false, id: 'tag_club' %>
+          <span style="font-size: 18px;">Club</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white;">
+          <%= check_box_tag 'event[tags][]', 'other', false, id: 'tag_other' %>
+          <span style="font-size: 18px;">Other</span>
+        </label>
+      </div>
+    </div>
 
       <div class="form-group">
         <%= f.label :description, "Description" %>

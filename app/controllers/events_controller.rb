@@ -2,22 +2,23 @@
 class EventsController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
   def index
-    now = Time.current
+    @events = Event.all
 
-  @events = Event.where(
-    "date > ? OR (date = ? AND start_time > ?)",
-    now.to_date, now.to_date, now
-  )
-    
+    # Filter by tags if any are selected
+    if params[:tags].present?
+      @events = @events.where("tags && ARRAY[?]::varchar[]", params[:tags])
+    end
+
+    # Sort events
     case params[:sort]
     when 'alphabetical'
-      @events = @events.order(title: :asc)
+      @events = @events.order(:title)
     when 'date'
-      @events = @events.order(date: :asc)
+      @events = @events.order(:date)
     when 'date-desc'
       @events = @events.order(date: :desc)
     else
-      @events = @events.order(created_at: :asc)
+      @events = @events.order(created_at: :desc)
     end
   end
 
