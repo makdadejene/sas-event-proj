@@ -13,7 +13,7 @@ https://quad-events-app-a4f62440aa74.herokuapp.com/
 
 ## Project Overview
 
-Quad allows students to post and browse campus events. Users can create events with a title, description, date, time, tags, and optionally an image. Events can be sorted by date or alphabetically.
+Quad allows students to post and browse campus events. Users can create events with a title, description, date, time, tags, and optionally an image. Events can be sorted by date or alphabetically. Events can also be filtered by tags and are sorted by upvotes. Users can also sign in using google and are able to edit/delete events.
 
 ## Features
 
