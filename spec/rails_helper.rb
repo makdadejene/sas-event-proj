@@ -73,6 +73,7 @@ RSpec.configure do |config|
   config.include Rails::Controller::Testing::TestProcess
   config.include Rails::Controller::Testing::TemplateAssertions
   config.include Rails::Controller::Testing::Integration
+  config.include Devise::Test::ControllerHelpers, type: :controller
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
@@ -89,4 +90,6 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
+
+  
 end

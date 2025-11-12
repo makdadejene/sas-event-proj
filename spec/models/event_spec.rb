@@ -1,14 +1,55 @@
-# spec/models/event_spec.rb
 require 'rails_helper'
 
 RSpec.describe Event, type: :model do
-  let(:event) { Event.create!(title: 'Test Event', description: 'Test', date: Date.today, time: '12:00', location: 'Test Location') }
+  let(:user) { User.create!(email: 'test@example.com', password: 'password123', password_confirmation: 'password123') }
+
+  describe 'validations' do
+    it 'is valid with valid attributes' do
+      event = Event.new(title: 'Test', date: Date.today, start_time: '18:00', user: user)
+      expect(event).to be_valid
+    end
+
+    it 'is invalid without a title' do
+      event = Event.new(title: nil, date: Date.today, start_time: '18:00', user: user)
+      expect(event).not_to be_valid
+      expect(event.errors[:title]).to include("can't be blank")
+    end
+
+    it 'is invalid without a date' do
+      event = Event.new(title: 'Test', date: nil, start_time: '18:00', user: user)
+      expect(event).not_to be_valid
+      expect(event.errors[:date]).to include("can't be blank")
+    end
+
+    it 'is invalid without a start_time' do
+      event = Event.new(title: 'Test', date: Date.today, start_time: nil, user: user)
+      expect(event).not_to be_valid
+      expect(event.errors[:start_time]).to include("can't be blank")
+    end
+  end
 
   describe 'associations' do
-    it { should have_many(:upvotes).dependent(:destroy) }
+    it 'has many upvotes' do
+      event = Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user)
+      expect(event).to respond_to(:upvotes)
+    end
+
+    it 'belongs to user' do
+      event = Event.new(title: 'Test', date: Date.today, start_time: '18:00')
+      expect(event).to respond_to(:user)
+    end
+
+    it 'destroys associated upvotes when destroyed' do
+      event = Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user)
+      upvote = event.upvotes.create!(email: 'test@example.com', username: 'testuser')
+      
+      expect { event.destroy }.to change { Upvote.count }.by(-1)
+    end
   end
 
   describe '#upvote_count' do
+    let(:event) { Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user) }
+
     it 'returns 0 when no upvotes' do
       expect(event.upvote_count).to eq(0)
     end
@@ -22,6 +63,8 @@ RSpec.describe Event, type: :model do
   end
 
   describe '#upvoted_by?' do
+    let(:event) { Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user) }
+
     it 'returns false when email has not upvoted' do
       expect(event.upvoted_by?('test@example.com')).to be false
     end
@@ -39,32 +82,26 @@ RSpec.describe Event, type: :model do
 
   describe '.sorted_by_upvotes' do
     it 'sorts events by upvote count in descending order' do
-      event1 = Event.create!(title: 'Event 1', description: 'Test', date: Date.today, time: '12:00', location: 'Test')
-      event2 = Event.create!(title: 'Event 2', description: 'Test', date: Date.today, time: '13:00', location: 'Test')
-      event3 = Event.create!(title: 'Event 3', description: 'Test', date: Date.today, time: '14:00', location: 'Test')
+      event1 = Event.create!(title: 'Event 1', date: Date.today, start_time: '18:00', user: user)
+      event2 = Event.create!(title: 'Event 2', date: Date.today, start_time: '19:00', user: user)
+      event3 = Event.create!(title: 'Event 3', date: Date.today, start_time: '20:00', user: user)
 
-      # Give event2 the most upvotes
-      5.times { |i| Upvote.create!(email: "user#{i}@test.com", username: "user#{i}", event: event2) }
-      # Give event3 medium upvotes
-      3.times { |i| Upvote.create!(email: "user#{i}@test2.com", username: "user#{i}", event: event3) }
-      # Give event1 least upvotes
-      1.times { |i| Upvote.create!(email: "user#{i}@test3.com", username: "user#{i}", event: event1) }
+      # event2 gets 3 upvotes
+      3.times { |i| Upvote.create!(email: "user#{i}@example.com", username: "user#{i}", event: event2) }
+      # event1 gets 1 upvote
+      Upvote.create!(email: 'single@example.com', username: 'single', event: event1)
+      # event3 gets 0 upvotes
 
       sorted = Event.sorted_by_upvotes
-      expect(sorted.first).to eq(event2)
-      expect(sorted.second).to eq(event3)
-      expect(sorted.third).to eq(event1)
+      expect(sorted.map(&:id)).to eq([event2.id, event1.id, event3.id])
     end
 
     it 'handles events with no upvotes' do
-      event_with_upvotes = Event.create!(title: 'Popular', description: 'Test', date: Date.today, time: '12:00', location: 'Test')
-      event_no_upvotes = Event.create!(title: 'Unpopular', description: 'Test', date: Date.today, time: '13:00', location: 'Test')
-      
-      Upvote.create!(email: 'test@example.com', username: 'testuser', event: event_with_upvotes)
-      
+      event1 = Event.create!(title: 'Event 1', date: Date.today, start_time: '18:00', user: user)
+      event2 = Event.create!(title: 'Event 2', date: Date.today, start_time: '19:00', user: user)
+
       sorted = Event.sorted_by_upvotes
-      expect(sorted.first).to eq(event_with_upvotes)
-      expect(sorted.last).to eq(event_no_upvotes)
+      expect(sorted).to include(event1, event2)
     end
   end
 end

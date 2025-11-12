@@ -2,15 +2,18 @@
 require 'rails_helper'
 
 RSpec.describe EventsController, type: :controller do
+  # Create a user that all tests can use
+  let!(:user) { User.create!(email: 'test@example.com', password: 'password123', password_confirmation: 'password123') }
+
   describe "GET #index" do
     # Use before block to ensure clean slate
     before do
       Event.destroy_all
     end
     
-    let!(:event1) { Event.create!(title: "Alpha Event", date: Date.today + 3, time: "18:00", tags: "Sports") }
-    let!(:event2) { Event.create!(title: "Beta Event", date: Date.today + 1, time: "19:00", tags: "Club") }
-    let!(:event3) { Event.create!(title: "Charlie Event", date: Date.today + 2, time: "20:00", tags: "Social") }
+    let!(:event1) { Event.create!(title: "Alpha Event", date: Date.today + 3, start_time: "18:00", user: user) }
+    let!(:event2) { Event.create!(title: "Beta Event", date: Date.today + 1, start_time: "19:00", user: user) }
+    let!(:event3) { Event.create!(title: "Charlie Event", date: Date.today + 2, start_time: "20:00", user: user) }
 
     context "without sort parameter" do
       it "returns success" do
@@ -68,6 +71,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe "GET #new" do
+    before(:each) { sign_in user }
+
     it "assigns a new event" do
       get :new
       expect(assigns(:event)).to be_a_new(Event)
@@ -80,9 +85,11 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe "POST #create" do
+    before(:each) { sign_in user }
+
     context "with valid parameters" do
       let(:valid_params) do
-        { event: { title: "New Event", date: Date.today, time: "18:00", tags: "Sports" } }
+        { event: { title: "New Event", date: Date.today, start_time: "18:00" } }
       end
 
       it "creates a new event" do
@@ -99,7 +106,7 @@ RSpec.describe EventsController, type: :controller do
 
     context "with invalid parameters" do
       let(:invalid_params) do
-        { event: { title: "", date: nil, time: nil } }
+        { event: { title: "", date: nil, start_time: nil } }
       end
 
       it "does not create a new event" do
@@ -121,24 +128,24 @@ RSpec.describe EventsController, type: :controller do
 
     context "with partial invalid parameters" do
       it "handles missing title" do
-        post :create, params: { event: { title: "", date: Date.today, time: "18:00" } }
+        post :create, params: { event: { title: "", date: Date.today, start_time: "18:00" } }
         expect(response).to render_template(:new)
       end
 
       it "handles missing date" do
-        post :create, params: { event: { title: "Event", date: nil, time: "18:00" } }
+        post :create, params: { event: { title: "Event", date: nil, start_time: "18:00" } }
         expect(response).to render_template(:new)
       end
 
       it "handles missing time" do
-        post :create, params: { event: { title: "Event", date: Date.today, time: nil } }
+        post :create, params: { event: { title: "Event", date: Date.today, start_time: nil } }
         expect(response).to render_template(:new)
       end
     end
   end
 
   describe "GET #show" do
-    let(:event) { Event.create!(title: "Test Event", date: Date.today, time: "18:00", tags: "Sports") }
+    let(:event) { Event.create!(title: "Test Event", date: Date.today, start_time: "18:00", user: user) }
 
     it "assigns the requested event" do
       get :show, params: { id: event.id }
@@ -148,17 +155,30 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe "GET #edit" do
-    let(:event) { Event.create!(title: "Test Event", date: Date.today, time: "18:00", tags: "Sports") }
+    before(:each) { sign_in user }
+    let(:event) { Event.create!(title: "Test Event", date: Date.today, start_time: "18:00", user: user) }
 
     it "assigns the requested event" do
       get :edit, params: { id: event.id }
       expect(assigns(:event)).to eq(event)
       expect(response).to be_successful
     end
+
+    context "when user is not the author" do
+      let(:other_user) { User.create!(email: 'other@example.com', password: 'password123', password_confirmation: 'password123') }
+      let(:other_event) { Event.create!(title: "Other Event", date: Date.today, start_time: "18:00", user: other_user) }
+
+      it "redirects with alert" do
+        get :edit, params: { id: other_event.id }
+        expect(response).to redirect_to(events_path)
+        expect(flash[:alert]).to include("not authorized")
+      end
+    end
   end
 
   describe "PUT #update" do
-    let(:event) { Event.create!(title: "Test Event", date: Date.today, time: "18:00", tags: "Sports") }
+    before(:each) { sign_in user }
+    let(:event) { Event.create!(title: "Test Event", date: Date.today, start_time: "18:00", user: user) }
 
     context "with valid parameters" do
       it "updates the event" do
@@ -182,7 +202,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe "DELETE #destroy" do
-    let!(:event) { Event.create!(title: "Test Event", date: Date.today, time: "18:00", tags: "Sports") }
+    before(:each) { sign_in user }
+    let!(:event) { Event.create!(title: "Test Event", date: Date.today, start_time: "18:00", user: user) }
 
     it "destroys the event" do
       expect {

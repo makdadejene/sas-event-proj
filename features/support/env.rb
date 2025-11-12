@@ -7,6 +7,7 @@
 require 'cucumber/rails'
 require 'rspec/mocks'
 
+
 World(RSpec::Mocks::ExampleMethods)
 
 Before do

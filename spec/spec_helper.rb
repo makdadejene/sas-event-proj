@@ -16,32 +16,26 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-if ENV['COVERAGE']
-  require 'simplecov'
-  SimpleCov.start 'rails' do
-    track_files 'app/**/*.rb'
-
-    add_filter 'app/channels/application_cable/channel.rb'
-    add_filter 'app/channels/application_cable/connection.rb'
-    add_filter 'app/jobs/application_job.rb'
-    add_filter 'app/mailers/application_mailer.rb'
-    add_filter 'app/models/application_record.rb'  
-    add_filter 'app/helpers/application_helper.rb'  
-    add_filter 'app/helpers/events_helper.rb'       
-    add_filter 'app/controllers/application_controller.rb'  
-    
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models',      'app/models'
-    add_group 'Views',       'app/views'
-
-  end
-
-  SimpleCov.at_exit do
-    SimpleCov.result.format!
-    pct = SimpleCov.result.covered_percent.round(2)
-    req = SimpleCov.minimum_coverage
-    puts "\n\nCOVERAGE #{pct}%"
-  end
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/'
+  add_filter '/test/'
+  add_filter '/config/'
+  add_filter '/vendor/'
+  add_filter '/features/'
+  add_filter 'app/channels/application_cable/'
+  add_filter 'app/jobs/application_job.rb'
+  add_filter 'app/mailers/application_mailer.rb'
+  add_filter 'app/models/application_record.rb'
+  add_filter 'app/helpers/application_helper.rb'
+  add_filter 'app/controllers/application_controller.rb'
+  
+  add_group 'Controllers', 'app/controllers'
+  add_group 'Models', 'app/models'
+  add_group 'Views', 'app/views'
+  add_group 'Helpers', 'app/helpers'
 end
 
 RSpec.configure do |config|

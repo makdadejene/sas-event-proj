@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe UpvotesController, type: :controller do
-  let(:event) { Event.create!(title: 'Test Event', description: 'Test', date: Date.today, time: '12:00', location: 'Test Location') }
+  let(:user) { User.create!(email: 'user@example.com', password: 'password123', password_confirmation: 'password123') }
+  let(:event) { Event.create!(title: 'Test Event', description: 'Test', date: Date.today, start_time: '12:00', location: 'Test Location', user: user) }
   let(:valid_params) { { event_id: event.id, upvote: { email: 'test@example.com', username: 'testuser' } } }
 
   describe 'POST #create' do

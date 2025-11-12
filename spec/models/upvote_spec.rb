@@ -1,10 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Upvote, type: :model do
-  let(:event) { Event.create!(title: 'Test Event', description: 'Test', date: Date.today, time: '12:00', location: 'Test Location') }
-  
+  let(:user) { User.create!(email: 'user@example.com', password: 'password123', password_confirmation: 'password123') }
+  let(:event) { Event.create!(title: 'Test Event', description: 'Test', date: Date.today, start_time: '12:00', location: 'Test Location', user: user) }
+
   describe 'associations' do
-    it { should belong_to(:event) }
+    it 'belongs to event' do
+      upvote = Upvote.new(email: 'test@example.com', username: 'testuser', event: event)
+      expect(upvote.event).to eq(event)
+    end
   end
 
   describe 'validations' do
@@ -45,7 +49,7 @@ RSpec.describe Upvote, type: :model do
     end
 
     it 'allows same email to upvote different events' do
-      event2 = Event.create!(title: 'Another Event', description: 'Test', date: Date.today, time: '14:00', location: 'Test')
+      event2 = Event.create!(title: 'Another Event', description: 'Test', date: Date.today, start_time: '14:00', location: 'Test', user: user)
       Upvote.create!(email: 'test@example.com', username: 'testuser', event: event)
       upvote2 = Upvote.new(email: 'test@example.com', username: 'testuser', event: event2)
       expect(upvote2).to be_valid
@@ -69,25 +73,24 @@ RSpec.describe Upvote, type: :model do
 
     it 'returns false when under rate limit' do
       5.times do |i|
-        event = Event.create!(title: "Event #{i}", description: 'Test', date: Date.today, time: '12:00', location: 'Test')
-        Upvote.create!(email: email, username: 'testuser', event: event)
+        event_temp = Event.create!(title: "Event #{i}", description: 'Test', date: Date.today, start_time: '12:00', location: 'Test', user: user)
+        Upvote.create!(email: email, username: 'testuser', event: event_temp)
       end
       expect(Upvote.rate_limit_exceeded?(email)).to be false
     end
 
     it 'returns true when rate limit exceeded' do
       10.times do |i|
-        event = Event.create!(title: "Event #{i}", description: 'Test', date: Date.today, time: '12:00', location: 'Test')
-        Upvote.create!(email: email, username: 'testuser', event: event)
+        event_temp = Event.create!(title: "Event #{i}", description: 'Test', date: Date.today, start_time: '12:00', location: 'Test', user: user)
+        Upvote.create!(email: email, username: 'testuser', event: event_temp)
       end
       expect(Upvote.rate_limit_exceeded?(email)).to be true
     end
 
     it 'only counts upvotes within time window' do
-      # Create old upvotes (outside time window)
       10.times do |i|
-        event = Event.create!(title: "Old Event #{i}", description: 'Test', date: Date.today, time: '12:00', location: 'Test')
-        upvote = Upvote.create!(email: email, username: 'testuser', event: event)
+        event_temp = Event.create!(title: "Old Event #{i}", description: 'Test', date: Date.today, start_time: '12:00', location: 'Test', user: user)
+        upvote = Upvote.create!(email: email, username: 'testuser', event: event_temp)
         upvote.update_column(:created_at, 2.hours.ago)
       end
       

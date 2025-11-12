@@ -6,6 +6,10 @@ class Event < ApplicationRecord
   belongs_to :user, optional: true
   has_one_attached :image
 
+  validates :title, presence: true
+  validates :date, presence: true
+  validates :start_time, presence: true
+
   # Add this method to get upvote count
   def upvote_count
     upvotes.count
