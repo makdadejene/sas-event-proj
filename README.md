@@ -20,8 +20,11 @@ Quad allows students to post and browse campus events. Users can create events w
 - Browse Events: View all campus events in a visually appealing grid layout
 - Sort & Filter: Sort events alphabetically, by date (earliest/latest first), or by default order
 - Create Events: Simple form to post new events with all relevant details
-- Responsive Design: Modern, gradient-styled interface that works on all devices
-- Event Details: Each event displays title, description, date, time, location, and tags
+- Responsive Design: Modern, gradient-styled interface that works on all device
+- Sign in: Users can sign in using google authentication
+- Edit/Delete Events: Users can edit/delete events that they created
+- Filter by Tags: Events are filtered based on tags
+- Upvotes: Events can be upvoted by users (only once per user) and this will influence order
 
 ## Getting Started
 
