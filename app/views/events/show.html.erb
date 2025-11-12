@@ -4,7 +4,15 @@
   
   <div class="event-info">
     <p><strong>Date:</strong> <%= @event.date.strftime("%b %d, %Y") %></p>
-    <p><strong>Time:</strong> <%= @event.time.strftime("%H:%M") %></p>
+      <p><strong>Time:</strong>
+        <% if @event.start_time && @event.end_time %>
+          <%= @event.start_time.strftime("%I:%M %p") %> – <%= @event.end_time.strftime("%I:%M %p") %>
+        <% elsif @event.start_time %>
+          <%= @event.start_time.strftime("%I:%M %p") %>
+        <% else %>
+          N/A
+        <% end %>
+      </p>
     <% if @event.description.present? %>
       <p><strong>Description:</strong> <%= @event.description %></p>
     <% end %>

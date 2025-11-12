@@ -45,11 +45,12 @@
 
   <div class="field">
     <%= f.label :tags, "Tags" %>
-    <%= f.select :tags, 
-          ["Sports", "Ed", "Social", "Art", "Club", "Other"], 
-          {}, 
-          { multiple: true, class: "form-control large-select" } %>
+    <%= select_tag "event[tags][]",
+          options_for_select(["Sports", "Ed", "Social", "Art", "Club", "Other"], @event.tags),
+          multiple: true,
+          class: "form-control large-select" %>
   </div>
+
 
   <div class="field">
     <%= f.label :unlisted, "Unlisted?" %>
