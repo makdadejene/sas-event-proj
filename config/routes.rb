@@ -3,5 +3,17 @@ Rails.application.routes.draw do
   
 
   root "events#index"
-  resources :events
+  resources :events do
+    member do
+      post 'upvote'
+    end
+  end
+
+  resources :events do
+    # Nested upvotes route
+    resources :upvotes, only: [:create]
+  end
+  
+  # Route for removing upvotes
+  resources :upvotes, only: [:destroy]
 end

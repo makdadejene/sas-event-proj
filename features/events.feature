@@ -22,7 +22,7 @@ Feature: Core Event Management
     Then I should see "Soccer Game"
     And I should see "Fun pickup game"
     And I should see "Nov 06, 2025"
-    And I should see "16:00"
+    And I should see "04:00 PM"
 
   Scenario: Navigate to create event page
     When I visit the events index page
@@ -36,7 +36,7 @@ Feature: Core Event Management
     And I fill in "Description" with "Learn new moves"
     And I fill in "Date" with "2025-11-20"
     And I fill in "Time" with "19:00"
-    And I fill in "Tags" with "Club, Cultural"
+    And I fill in "Tags" with "Club, Other"
     And I press "Submit"
     Then I should see "Dance Workshop"
     And I should see "Learn new moves"

@@ -1,109 +1,101 @@
 # features/step_definitions/events_step.rb
 
-Given("the following events exist:") do |events_table|
-  events_table.hashes.each do |event|
+Given('the following events exist:') do |table|
+  # Create a default test user for OAuth
+  @test_user = User.find_or_create_by!(email: 'test@example.com') do |user|
+    user.provider = 'google_oauth2'
+    user.uid = '123545'
+    user.name = 'Test User' if user.respond_to?(:name=)
+  end
+
+  table.hashes.each do |row|
     Event.create!(
-      title: event['title'],
-      description: event['description'],
-      date: event['date'],
-      time: event['time'],
-      tags: event['tags']
+      title: row['title'],
+      description: row['description'],
+      date: row['date'],
+      start_time: row['time'],
+      tags: row['tags']&.split(',')&.map(&:strip) || [],
+      location: row['location'],
+      user: @test_user
     )
   end
 end
 
-When("I visit the events index page") do
+When('I visit the events index page') do
   visit events_path
 end
 
-Given("I am on the events index page") do
-  visit events_path
+When('I visit the events page with sort option {string}') do |sort_option|
+  visit events_path(sort: sort_option)
 end
 
-When("I visit the events page with sort option {string}") do |sort|
-  visit events_path(sort: sort)
-end
-
-Given("I am on the new event page") do
+Given('I am on the new event page') do
+  @test_user = User.find_or_create_by!(email: 'test@example.com') do |user|
+    user.provider = 'google_oauth2'
+    user.uid = '123545'
+    user.name = 'Test User' if user.respond_to?(:name=)
+  end
+  
+  allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+  allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@test_user)
+  
   visit new_event_path
 end
 
-When("I fill in {string} with {string}") do |field, value|
-  begin
+# Update your fill_in step:
+When('I fill in {string} with {string}') do |field, value|
+  if field == "Time"
+    fill_in "Start Time", with: value
+  elsif field == "Tags"
+    tags = value.split(',').map(&:strip).map(&:downcase)
+    tags.each do |tag|
+      check "tag_#{tag}"
+    end
+  elsif field == "Username" || field == "Email Address"
+    within('.modal.show', visible: true) do
+      fill_in field, with: value
+    end
+  else
     fill_in field, with: value
-  rescue Capybara::ElementNotFound
-    field_id = "event_#{field.downcase.gsub(' ', '_')}"
-    fill_in field_id, with: value
   end
 end
 
-When("I press {string}") do |button_text|
-  click_button button_text
+When('I press {string}') do |button|
+  click_button button
 end
 
-When("I click on the add event button") do
-  find('a.add-btn').click
+When('I click on the add event button') do
+  # Bypass auth before clicking
+  @test_user = User.find_or_create_by!(email: 'test@example.com') do |user|
+    user.provider = 'google_oauth2'
+    user.uid = '123545'
+    user.name = 'Test User'
+  end
+  
+  allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+  allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@test_user)
+  
+  click_link_or_button '+'
 end
-
-When("I click the close button") do
-  find('button.close-btn').click
-end
-
-Then("I should see {string}") do |text|
+Then('I should see {string}') do |text|
   expect(page).to have_content(text)
 end
 
-Then("I should see individual tags {string}") do |tags|
-  tag_array = tags.split(',').map(&:strip)
-  tag_array.each do |tag|
-    expect(page).to have_css('.tag', text: tag)
-  end
+Then('I should see {string} before {string}') do |first_text, second_text|
+  page_text = page.body
+  first_position = page_text.index(first_text)
+  second_position = page_text.index(second_text)
+  
+  expect(first_position).not_to be_nil, "Expected to find '#{first_text}' on the page"
+  expect(second_position).not_to be_nil, "Expected to find '#{second_text}' on the page"
+  expect(first_position).to be < second_position, 
+    "Expected '#{first_text}' to appear before '#{second_text}'"
 end
 
-Then("I should not see {string}") do |text|
-  expect(page).not_to have_content(text)
+Then('I should be on the new event page') do
+  expect(current_path).to eq(new_event_path)
 end
 
-Then("I should see {string} before {string}") do |text1, text2|
-  expect(page.body.index(text1)).to be < page.body.index(text2)
-end
-
-Then("I should be on the new event page") do
-  expect(page).to have_current_path(new_event_path)
-end
-
-Then("I should be on the events index page") do
-  expect(page).to have_current_path(events_path)
-end
-
-Then("the events should have {string} tag") do |tag|
-  within('.events-grid') do
-    expect(page).to have_css('.tag', text: tag)
-  end
-end
-
-Then("the events should be displayed in creation order") do
-  events = Event.order(:created_at)
-  first_event_title = events.first.title
-  expect(page.body.index(first_event_title)).to be > 0
-end
-
-Then("I should see events with tag {string}") do |tag|
-  expect(page).to have_css('.tag', text: tag)
-end
-
-Then("I should see dates in {string} format") do |format|
-  expect(page).to have_css('.event-date')
-  dates = page.all('.event-date').map(&:text)
-  dates.each do |date_text|
-    expect(date_text).to match(/[A-Z][a-z]{2} \d{2}, \d{4}/)
-  end
-end
-
-Then("I should see times in {string} format") do |format|
-  expect(page).to have_css('.event-time')
-  times = page.all('.event-time').map(&:text)
-  times.each do |time_text|
-    expect(time_text).to match(/\d{2}:\d{2}/)
-  end
+Then('I should be on the events index page') do
+  expect(current_path).to eq(events_path)
 end

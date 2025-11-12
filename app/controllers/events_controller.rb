@@ -25,6 +25,8 @@ class EventsController < ApplicationController
       @events = @events.order(:date)
     when 'date-desc'
       @events = @events.order(date: :desc)
+    when 'upvotes'
+      @events = @events.sorted_by_upvotes
     else
       @events = @events.order(created_at: :desc)
     end
