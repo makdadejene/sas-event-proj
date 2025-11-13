@@ -1,12 +1,6 @@
 class EventsController < ApplicationController
-  # Ensure user is logged in for these actions
-  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
-
-  # Load the event before edit/update/destroy
-  before_action :set_event, only: [:edit, :update, :destroy]
-
-  # Ensure only the author can edit/update/destroy
-  before_action :authorize_user!, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :set_event, only: [:show, :edit, :update, :destroy, :upvote]
 
   def index
     @events = Event.all
@@ -32,7 +26,9 @@ class EventsController < ApplicationController
     end
   end
 
-
+  def show
+    # @event is already loaded by set_event
+  end
 
   def new
     @event = Event.new
@@ -49,10 +45,6 @@ class EventsController < ApplicationController
     end
   end
 
-  def show
-    @event = Event.find(params[:id])
-  end
-
   def edit
     # @event is already loaded by set_event
   end
@@ -67,11 +59,25 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    @event = Event.find(params[:id])
+    # @event is already loaded by set_event
     @event.destroy
     redirect_to events_path, notice: "Event deleted successfully."
   end
 
+  def upvote
+    unless current_user
+      render json: { error: 'Must be logged in to upvote' }, status: :unauthorized
+      return
+    end
+
+    # Toggle the upvote
+    upvoted = @event.toggle_upvote(current_user)
+    
+    render json: {
+      upvoted: upvoted,
+      upvote_count: @event.upvote_count
+    }
+  end
 
   private
 
@@ -94,6 +100,7 @@ class EventsController < ApplicationController
       :location,
       :description,
       :image,
+      :unlisted,
       tags: []
     )
   end

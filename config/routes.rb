@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
   
 
-  root "events#index"
+  root "events#new"
   resources :events do
     member do
       post 'upvote'
@@ -14,6 +14,9 @@ Rails.application.routes.draw do
     resources :upvotes, only: [:create]
   end
   
-  # Route for removing upvotes
-  resources :upvotes, only: [:destroy]
+  resources :events do
+    member do
+      post :upvote
+    end
+  end
 end

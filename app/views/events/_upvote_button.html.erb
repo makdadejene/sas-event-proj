@@ -1,39 +1,85 @@
-<div class="upvote-container" data-event-id="<%= event.id %>">
-  <button class="upvote-btn" data-bs-toggle="modal" data-bs-target="#upvoteModal<%= event.id %>">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M7 10l5-5 5 5M7 14l5 5 5-5"/>
-    </svg>
+<%# app/views/events/_upvote_button.html.erb %>
+
+<div class="upvote-container">
+  <button class="upvote-btn <%= 'upvoted' if current_user && event.upvoted_by?(current_user) %>" 
+          onclick="toggleUpvote(<%= event.id %>, this)"
+          data-event-id="<%= event.id %>">
+    <span class="upvote-icon">↑</span>
     <span class="upvote-count"><%= event.upvote_count %></span>
   </button>
 </div>
 
-<!-- Upvote Modal -->
-<div class="modal fade" id="upvoteModal<%= event.id %>" tabindex="-1" aria-labelledby="upvoteModalLabel<%= event.id %>" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="upvoteModalLabel<%= event.id %>">Upvote Event</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form class="upvote-form" data-event-id="<%= event.id %>">
-          <div class="mb-3">
-            <label for="username<%= event.id %>" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username<%= event.id %>" name="username" required>
-          </div>
-          <div class="mb-3">
-            <label for="email<%= event.id %>" class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="email<%= event.id %>" name="email" required>
-            <div class="form-text">We use your email to prevent duplicate votes.</div>
-          </div>
-          <div class="alert alert-danger d-none error-message"></div>
-          <div class="alert alert-success d-none success-message"></div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary submit-upvote">Submit Upvote</button>
-      </div>
-    </div>
-  </div>
-</div>
+<style>
+  .upvote-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .upvote-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .upvote-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+  }
+
+  .upvote-btn.upvoted {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+  }
+
+  .upvote-icon {
+    font-size: 24px;
+  }
+
+  .upvote-count {
+    font-size: 20px;
+    font-weight: 700;
+  }
+</style>
+
+<script>
+  function toggleUpvote(eventId, button) {
+    // Prevent double-clicks
+    if (button.disabled) return;
+    button.disabled = true;
+    
+    fetch(`/events/${eventId}/upvote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Toggle upvoted state
+      button.classList.toggle('upvoted');
+      
+      // Update count
+      const countElement = button.querySelector('.upvote-count');
+      countElement.textContent = data.upvote_count;
+      
+      button.disabled = false;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to upvote. Please try again.');
+      button.disabled = false;
+    });
+  }
+</script>

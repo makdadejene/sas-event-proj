@@ -1,65 +1,339 @@
 <!-- app/views/events/edit.html.erb -->
-<h1>Edit Event</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Event</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<%= form_with(model: @event, local: true) do |f| %>
-  <% if @event.errors.any? %>
-    <div class="errors">
-      <h2><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</h2>
-      <ul>
-        <% @event.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #8b8b7a 0%, #c9c5b8 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .form-container {
+            background: rgba(60, 60, 55, 0.9);
+            border-radius: 30px;
+            padding: 40px;
+        }
+
+        .errors {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid rgba(220, 53, 69, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .errors h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .errors ul {
+            margin-left: 20px;
+        }
+
+        .errors li {
+            margin-bottom: 5px;
+        }
+
+        .field {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        select {
+            min-height: 120px;
+        }
+
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-field label {
+            margin-bottom: 0;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        input[type="submit"],
+        .back-btn {
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        input[type="submit"]:hover,
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Style for date and time inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Placeholder color */
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-container label:first-child {
+            align-self: flex-start;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .upload-box {
+            width: 120px;
+            height: 120px;
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upload-box:hover {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Event</h1>
+        
+        <div class="form-container">
+            <%= form_with(model: @event, local: true) do |f| %>
+                <% if @event.errors.any? %>
+                    <div class="errors">
+                        <h2><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</h2>
+                        <ul>
+                            <% @event.errors.full_messages.each do |message| %>
+                                <li><%= message %></li>
+                            <% end %>
+                        </ul>
+                    </div>
+                <% end %>
+
+                <div class="field">
+                    <%= f.label :title, "Title" %>
+                    <%= f.text_field :title, placeholder: "Event name" %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :date, "Date" %>
+                    <%= f.date_field :date %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :start_time, "Start Time" %>
+                    <%= f.time_field :start_time %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :end_time, "End Time" %>
+                    <%= f.time_field :end_time %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :location, "Location" %>
+                    <%= f.text_field :location, placeholder: "Where is this happening?" %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :description, "Description" %>
+                    <%= f.text_area :description, placeholder: "Tell us about your event..." %>
+                </div>
+
+                <div class="field upload-container">
+                    <%= f.label :image, "Upload Image" %>
+                    <label for="event_image" class="upload-box">
+                        <svg class="upload-icon" viewBox="0 0 24 24">
+                            <path d="M12 4v12m0-12l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" 
+                                  stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </label>
+                    <%= f.file_field :image, accept: "image/*", id: "event_image", style: "display: none;" %>
+                    <% if @event.image.attached? %>
+                        <small style="color: rgba(255,255,255,0.7); margin-top: 10px; display: block; text-align: center;">Current image attached. Upload a new one to replace it.</small>
+                    <% end %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :tags, "Tags" %>
+                    <div class="tags-container">
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'art', @event.tags.include?('art'), id: 'tag_art' %>
+                            <span>Art</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'sports', @event.tags.include?('sports'), id: 'tag_sports' %>
+                            <span>Sports</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'ed', @event.tags.include?('ed'), id: 'tag_ed' %>
+                            <span>Ed</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'social', @event.tags.include?('social'), id: 'tag_social' %>
+                            <span>Social</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'club', @event.tags.include?('club'), id: 'tag_club' %>
+                            <span>Club</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'other', @event.tags.include?('other'), id: 'tag_other' %>
+                            <span>Other</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field checkbox-field">
+                    <%= f.check_box :unlisted %>
+                    <%= f.label :unlisted, "Make this event private (unlisted)" %>
+                </div>
+
+                <div class="actions">
+                    <%= f.submit "Update Event" %>
+                    <%= link_to "Cancel", events_path, class: "back-btn" %>
+                </div>
+            <% end %>
+        </div>
     </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :title, "Title" %>
-    <%= f.text_field :title %>
-  </div>
-
-  <div class="field">
-    <%= f.label :date, "Date" %>
-    <%= f.date_field :date %>
-  </div>
-
-  <div class="field">
-    <%= f.label :start_time, "Start Time" %>
-    <%= f.time_field :start_time %>
-  </div>
-
-  <div class="field">
-    <%= f.label :end_time, "End Time" %>
-    <%= f.time_field :end_time %>
-  </div>
-
-  <div class="field">
-    <%= f.label :location, "Location" %>
-    <%= f.text_field :location %>
-  </div>
-
-  <div class="field">
-    <%= f.label :description, "Description" %>
-    <%= f.text_area :description %>
-  </div>
-
-  <div class="field">
-    <%= f.label :tags, "Tags" %>
-    <%= select_tag "event[tags][]",
-          options_for_select(["Sports", "Ed", "Social", "Art", "Club", "Other"], @event.tags),
-          multiple: true,
-          class: "form-control large-select" %>
-  </div>
-
-
-  <div class="field">
-    <%= f.label :unlisted, "Unlisted?" %>
-    <%= f.check_box :unlisted %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update Event" %>
-  </div>
-<% end %>
-
-<%= link_to "Back", events_path %>
+</body>
+</html>

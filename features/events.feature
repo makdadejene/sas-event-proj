@@ -77,3 +77,11 @@ Feature: Core Event Management
     And I fill in "Time" with "18:00"
     And I press "Submit"
     Then I should be on the events index page
+
+  Scenario: Fail to create an event without a title
+    Given I am on the new event page
+    When I fill in "Description" with "No title here"
+    And I fill in "Date" with "2025-12-10"
+    And I fill in "Time" with "17:00"
+    And I press "Submit"
+    Then I should see "Title can't be blank"

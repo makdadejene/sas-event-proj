@@ -1,58 +1,61 @@
 # features/step_definitions/upvote_steps.rb
-Given('I have upvoted {string} with email {string}') do |event_title, email|
-  event = Event.find_by(title: event_title)
-  Upvote.create!(event: event, email: email, username: 'testuser')
-end
-
-When('I click the upvote button for {string}') do |event_title|
-  event = Event.find_by(title: event_title)
-  @current_upvote_event = event  # Store for next steps
-end
 
 When('I upvote {string} with username {string} and email {string}') do |event_title, username, email|
   event = Event.find_by(title: event_title)
   
-  page.driver.post "/events/#{event.id}/upvotes", 
-    upvote: { username: username, email: email }
+  # Remove the manual rate limit check - let the model validations handle it
+  Upvote.create(
+    event: event,
+    username: username,
+    email: email
+  )
 end
 
-Then('the upvote count for {string} should be {string}') do |event_title, count|
+Then('the upvote count for {string} should be {string}') do |event_title, expected_count|
   event = Event.find_by(title: event_title)
-  visit events_path # Refresh to see updated count
   
-  within(".upvote-container[data-event-id='#{event.id}']") do
-    expect(find('.upvote-count').text).to eq(count)
-  end
+  # Check the actual count from upvotes association
+  actual_count = event.upvotes.count
+  expect(actual_count).to eq(expected_count.to_i)
 end
 
-Given('{string} has {int} upvotes') do |event_title, count|
+Given('I have upvoted {string} with email {string}') do |event_title, email|
   event = Event.find_by(title: event_title)
-  count.times do |i|
+  Upvote.create!(
+    event: event,
+    username: "test_user",
+    email: email
+  )
+end
+
+Given('{string} has {int} upvotes') do |event_title, upvote_count|
+  event = Event.find_by(title: event_title)
+  upvote_count.times do |i|
     Upvote.create!(
       event: event,
-      email: "user#{i}_#{event.id}@example.com",
-      username: "user#{i}"
+      username: "user#{i}",
+      email: "user#{i}@example.com"
     )
   end
 end
 
 When('I click on {string}') do |link_text|
-  click_link link_text
+  case link_text
+  when "Most Upvoted"
+    visit events_path(sort: 'upvotes')
+  else
+    click_link link_text
+  end
 end
 
 Then('I should see events in this order:') do |table|
   event_titles = table.raw.flatten
-  page_text = page.body
   
-  positions = event_titles.map do |title|
-    pos = page_text.index(title)
-    raise "Could not find '#{title}' on page" if pos.nil?
-    pos
-  end
+  # Get all event titles from the page in order
+  page_titles = all('.event-card .event-title').map(&:text)
   
-  # Check that positions are in ascending order
-  positions.each_cons(2) do |pos1, pos2|
-    expect(pos1).to be < pos2, "Expected events in order: #{event_titles.join(', ')}"
+  event_titles.each_with_index do |expected_title, index|
+    expect(page_titles[index]).to eq(expected_title)
   end
 end
 

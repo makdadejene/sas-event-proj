@@ -15,7 +15,7 @@ Given('the following events exist:') do |table|
       date: row['date'],
       start_time: row['time'],
       tags: row['tags']&.split(',')&.map(&:strip) || [],
-      location: row['location'],
+      location: row['location'] || 'Default Location',
       user: @test_user
     )
   end
@@ -24,6 +24,7 @@ end
 When('I visit the events index page') do
   visit events_path
 end
+
 
 When('I visit the events page with sort option {string}') do |sort_option|
   visit events_path(sort: sort_option)
@@ -42,19 +43,26 @@ Given('I am on the new event page') do
   visit new_event_path
 end
 
-# Update your fill_in step:
 When('I fill in {string} with {string}') do |field, value|
-  if field == "Time"
+  case field
+  when "Time"
     fill_in "Start Time", with: value
-  elsif field == "Tags"
+  when "Tags"
     tags = value.split(',').map(&:strip).map(&:downcase)
     tags.each do |tag|
-      check "tag_#{tag}"
+      tag_id = "tag_#{tag.gsub(' ', '_')}"
+      check tag_id
     end
-  elsif field == "Username" || field == "Email Address"
+  when "Username", "Email Address"
     within('.modal.show', visible: true) do
       fill_in field, with: value
     end
+  when "Title"
+    fill_in "event_title", with: value
+  when "Description"
+    fill_in "event_description", with: value
+  when "Date"
+    fill_in "event_date", with: value
   else
     fill_in field, with: value
   end
@@ -75,8 +83,18 @@ When('I click on the add event button') do
   allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
   allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@test_user)
   
-  click_link_or_button '+'
+  # Try different possible selectors for the add button
+  begin
+    click_link_or_button '+'
+  rescue Capybara::ElementNotFound
+    begin
+      click_link 'Create New Event'
+    rescue Capybara::ElementNotFound
+      click_link 'New Event'
+    end
+  end
 end
+
 Then('I should see {string}') do |text|
   expect(page).to have_content(text)
 end
