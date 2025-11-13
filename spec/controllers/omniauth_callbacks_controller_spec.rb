@@ -38,7 +38,7 @@ RSpec.describe Users::OmniauthCallbacksController, type: :controller do
           get :google_oauth2
         }.to change(User, :count).by(1)
 
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(events_path)
         expect(controller.current_user).to be_present
         expect(controller.current_user.email).to eq('test@example.com')
       end

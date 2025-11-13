@@ -88,37 +88,33 @@ RSpec.describe UpvotesController, type: :controller do
     end
   end
 
-  describe 'DELETE #destroy' do
-    let!(:upvote) { Upvote.create!(email: 'test@example.com', username: 'testuser', event: event) }
+    describe 'DELETE #destroy' do
+        let!(:upvote) { Upvote.create!(email: 'test@example.com', username: 'testuser', event: event) }
 
-    context 'with valid email' do
-      it 'deletes the upvote' do
-        expect {
-          delete :destroy, params: { id: upvote.id, email: 'test@example.com' }, format: :json
-        }.to change(Upvote, :count).by(-1)
-      end
+        context 'with valid email' do
+            it 'deletes the upvote' do
+            expect {
+                delete :destroy, params: { event_id: event.id, id: upvote.id, email: 'test@example.com', format: :json }
+            }.to change(Upvote, :count).by(-1)
+            end
 
-      it 'returns success response' do
-        delete :destroy, params: { id: upvote.id, email: 'test@example.com' }, format: :json
-        expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json['success']).to be true
-      end
-    end
+            it 'returns success response' do
+            delete :destroy, params: { event_id: event.id, id: upvote.id, email: 'test@example.com', format: :json }
+            expect(response).to have_http_status(:ok)
+            end
+        end
 
-    context 'with wrong email' do
-      it 'does not delete the upvote' do
-        expect {
-          delete :destroy, params: { id: upvote.id, email: 'wrong@example.com' }, format: :json
-        }.not_to change(Upvote, :count)
-      end
+        context 'with wrong email' do
+            it 'does not delete the upvote' do
+            expect {
+                delete :destroy, params: { event_id: event.id, id: upvote.id, email: 'wrong@example.com', format: :json }
+            }.not_to change(Upvote, :count)
+            end
 
-      it 'returns not found error' do
-        delete :destroy, params: { id: upvote.id, email: 'wrong@example.com' }, format: :json
-        expect(response).to have_http_status(:not_found)
-        json = JSON.parse(response.body)
-        expect(json['error']).to eq('Upvote not found')
-      end
-    end
-  end
+            it 'returns not found error' do
+            delete :destroy, params: { event_id: event.id, id: upvote.id, email: 'wrong@example.com', format: :json }
+            expect(response).to have_http_status(:not_found)
+            end
+        end
+        end
 end

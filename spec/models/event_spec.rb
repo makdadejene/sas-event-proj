@@ -78,6 +78,112 @@ RSpec.describe Event, type: :model do
       Upvote.create!(email: 'test@example.com', username: 'testuser', event: event)
       expect(event.upvoted_by?('TEST@EXAMPLE.COM')).to be true
     end
+
+    it 'returns false when user is nil' do
+      expect(event.upvoted_by?(nil)).to be false
+    end
+
+    it 'handles User objects' do
+      Upvote.create!(email: user.email, username: 'testuser', event: event)
+      expect(event.upvoted_by?(user)).to be true
+    end
+
+    it 'returns false for invalid input types' do
+      expect(event.upvoted_by?(123)).to be false
+    end
+  end
+
+  describe '#toggle_upvote' do
+    let(:event) { Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user) }
+
+    it 'returns false when user is nil' do
+      expect(event.toggle_upvote(nil)).to be false
+    end
+
+    it 'creates an upvote when user has not upvoted' do
+      expect {
+        event.toggle_upvote(user)
+      }.to change { event.upvotes.count }.by(1)
+    end
+
+    it 'returns true when creating an upvote' do
+      expect(event.toggle_upvote(user)).to be true
+    end
+
+    it 'removes an upvote when user has already upvoted' do
+      event.upvotes.create!(email: user.email, username: user.name || user.email)
+      
+      expect {
+        event.toggle_upvote(user)
+      }.to change { event.upvotes.count }.by(-1)
+    end
+
+    it 'returns false when removing an upvote' do
+      event.upvotes.create!(email: user.email, username: user.name || user.email)
+      expect(event.toggle_upvote(user)).to be false
+    end
+
+    it 'uses user name if available' do
+      user_with_name = User.create!(
+        email: 'named@example.com',
+        password: 'password123',
+        password_confirmation: 'password123',
+        name: 'John Doe'
+      )
+      
+      event.toggle_upvote(user_with_name)
+      upvote = event.upvotes.last
+      expect(upvote.username).to eq('John Doe')
+    end
+
+    it 'uses email as username if name is not available' do
+      event.toggle_upvote(user)
+      upvote = event.upvotes.last
+      expect(upvote.username).to eq(user.email)
+    end
+  end
+
+  describe '#tags' do
+    let(:event) { Event.create!(title: 'Test', date: Date.today, start_time: '18:00', user: user) }
+
+    it 'returns empty array when tags is nil' do
+      event.update_column(:tags, nil)
+      expect(event.tags).to eq([])
+    end
+
+    it 'returns tags array when tags exist' do
+      event.update(tags: ['sports', 'outdoor'])
+      expect(event.tags).to eq(['sports', 'outdoor'])
+    end
+  end
+
+  describe '#tags=' do
+    let(:event) { Event.new(title: 'Test', date: Date.today, start_time: '18:00', user: user) }
+
+    it 'handles string input with commas' do
+      event.tags = 'sports, outdoor, fun'
+      expect(event.tags).to eq(['sports', 'outdoor', 'fun'])
+    end
+
+    it 'strips whitespace from string tags' do
+      event.tags = '  sports  ,  outdoor  '
+      expect(event.tags).to eq(['sports', 'outdoor'])
+    end
+
+    it 'handles array input' do
+      event.tags = ['sports', 'outdoor']
+      expect(event.tags).to eq(['sports', 'outdoor'])
+    end
+
+    it 'removes blank values from arrays' do
+      event.tags = ['sports', '', 'outdoor', nil]
+      expect(event.tags).to eq(['sports', 'outdoor'])
+    end
+
+    it 'handles non-string, non-array input' do
+      event.tags = 123
+      expect(event.tags).to eq([])
+    end
   end
 
   describe '.sorted_by_upvotes' do

@@ -46,7 +46,11 @@ class EventsController < ApplicationController
   end
 
   def edit
-    # @event is already loaded by set_event
+    @event = Event.find(params[:id])
+    unless @event.user == current_user
+      redirect_to events_path, alert: "You are not authorized to edit this event"
+      return
+    end
   end
 
   def update
