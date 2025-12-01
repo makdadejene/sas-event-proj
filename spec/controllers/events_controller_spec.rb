@@ -200,6 +200,25 @@ RSpec.describe EventsController, type: :controller do
       end
     end
   end
+  
+  describe "GET #show" do
+    it "displays event details" do
+      event = Event.create!(title: "Test", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      get :show, params: { id: event.id }
+      expect(response).to be_successful
+    end
+  end
+
+  describe "DELETE #destroy" do
+    it "deletes the event" do
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+      
+      event = Event.create!(title: "Test", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      delete :destroy, params: { id: event.id }
+      expect(Event.exists?(event.id)).to be false
+    end
+  end
 
   describe "DELETE #destroy" do
     before(:each) { sign_in user }
@@ -216,4 +235,52 @@ RSpec.describe EventsController, type: :controller do
       expect(response).to redirect_to(events_path)
     end
   end
+
+  describe "GET #edit" do
+    it "shows edit form for owner" do
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+      event = Event.create!(title: "Test", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      get :edit, params: { id: event.id }
+      expect(response).to be_successful
+    end
+    
+    it "redirects non-owner" do
+      other_user = User.create!(email: "other@example.com", provider: "google_oauth2", uid: "999")
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(other_user)
+      event = Event.create!(title: "Test", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      get :edit, params: { id: event.id }
+      expect(response).to redirect_to(events_path)
+    end
+  end
+
+  describe "PATCH #update" do
+    it "updates event with valid params" do
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+      event = Event.create!(title: "Old Title", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      patch :update, params: { id: event.id, event: { title: "New Title" } }
+      event.reload
+      expect(event.title).to eq("New Title")
+    end
+    
+    it "fails with invalid params" do
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+      event = Event.create!(title: "Test", date: Date.today, start_time: "14:00", location: "Hall", user: user)
+      patch :update, params: { id: event.id, event: { title: "" } }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe "POST #create with invalid data" do
+    it "re-renders form on validation error" do
+      allow(controller).to receive(:authenticate_user!).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+      post :create, params: { event: { title: "" } }
+      expect(response).to render_template(:new)
+    end
+  end
+  
 end

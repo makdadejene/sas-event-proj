@@ -4,6 +4,27 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
+
+require 'simplecov'
+
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/'
+  add_filter '/test/'
+  add_filter '/features/'
+  add_filter '/config/'
+  
+  add_group 'Models', 'app/models'
+  add_group 'Controllers', 'app/controllers'
+  
+  minimum_coverage 85
+  
+  # Enable result merging
+  use_merging true
+  merge_timeout 3600
+end
+
 require 'cucumber/rails'
 require 'rspec/mocks'
 
