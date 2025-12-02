@@ -13,7 +13,7 @@ https://quad-events-app-a4f62440aa74.herokuapp.com/
 
 ## Project Overview
 
-Quad allows students to post and browse campus events. Users can create events with a title, description, date, time, tags, and optionally an image. Events can be sorted by date or alphabetically. Events can also be filtered by tags and are sorted by upvotes. Users can also sign in using google and are able to edit/delete events.
+Quad allows students to post and browse campus events. Students can post and interact with a wide variety of events, whether casual or club-sponsored.
 
 ## Features
 
@@ -25,6 +25,8 @@ Quad allows students to post and browse campus events. Users can create events w
 - Edit/Delete Events: Users can edit/delete events that they created
 - Filter by Tags: Events are filtered based on tags
 - Upvotes: Events can be upvoted by users (only once per user) and this will influence order
+- Unlisted: Event will not show up on feed if unlisted is checked.
+- Share: Share event via multiple platforms.
 
 ## Getting Started
 
@@ -36,7 +38,7 @@ Quad allows students to post and browse campus events. Users can create events w
 - Node.js
 - Yarn
 
-### Setup Instructions
+### Local Setup Instructions
 
 1. **Clone the repository:**
    \`\`\`bash
@@ -57,13 +59,20 @@ Quad allows students to post and browse campus events. Users can create events w
    rails db:seed
    \`\`\`
 
-4. **Start the Rails server:**
+4. **Google Auth Set Up**
+   - Create a `.env` file in the root folder
+   - Add the following environment variables:
+     ```
+     GOOGLE_CLIENT_ID=your_google_client_id
+     GOOGLE_CLIENT_SECRET=your_google_client_secret
+     ```
+   - The exact API keys will be included in the submission comments
+
+5. **Start the Rails server:**
    \`\`\`bash
    rails server
    \`\`\`
 
-5. **Visit the app:**
-   Open your browser and go to [http://localhost:3000](http://localhost:3000)
 
 ### Running Tests
 

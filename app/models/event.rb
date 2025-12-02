@@ -9,6 +9,8 @@ class Event < ApplicationRecord
   validates :title, presence: true
   validates :date, presence: true
   validates :start_time, presence: true
+  validates :end_time, presence: true
+  validate  :end_time_after_start_time 
 
   # Scope for sorting by upvotes
   scope :sorted_by_upvotes, -> { 
@@ -70,6 +72,15 @@ class Event < ApplicationRecord
       super(value.reject(&:blank?))
     else
       super([])
+    end
+  end
+
+
+  def end_time_after_start_time
+    return if start_time.blank? || end_time.blank?
+
+    if end_time < start_time
+      errors.add(:end_time, "can't be earlier than the start time")
     end
   end
 end
