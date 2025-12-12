@@ -1,28 +1,75 @@
 <!-- app/views/events/show.html.erb -->
-<div class="event-detail">
-  <h1><%= @event.title %></h1>
-  
-  <div class="event-info">
-    <p><strong>Date:</strong> <%= @event.date.strftime("%b %d, %Y") %></p>
-      <p><strong>Time:</strong>
-        <% if @event.start_time && @event.end_time %>
-          <%= @event.start_time.strftime("%I:%M %p") %> – <%= @event.end_time.strftime("%I:%M %p") %>
-        <% elsif @event.start_time %>
-          <%= @event.start_time.strftime("%I:%M %p") %>
-        <% else %>
-          N/A
-        <% end %>
-      </p>
+<div class="event-detail" style="max-width: 1200px; margin: 40px auto; position: relative; background: rgba(60, 60, 55, 0.9); padding: 40px; border-radius: 30px; color: white;">
+
+  <!-- Event Image -->
+  <div style="text-align: center; margin-bottom: 30px;">
+    <% if @event.image.attached? %>
+      <%= image_tag @event.image, style: "width: 500px; height: 300px; object-fit: cover; border-radius: 15px;" %>
+    <% else %>
+      <img src="https://spotme.com/wp-content/uploads/2020/07/Hero-1.jpg" 
+           alt="<%= @event.title %>" 
+           style="width: 500px; height: 300px; object-fit: cover; border-radius: 15px;">
+    <% end %>
+  </div>
+
+  <!-- Event Title -->
+  <h1 style="font-size: 48px; font-weight: 700; margin-bottom: 20px; text-align: center;"><%= @event.title %></h1>
+
+  <!-- Event Info -->
+  <div class="event-info" style="font-size: 18px; line-height: 1.5; margin-bottom: 30px;">
+    <% if @event.date %>
+      <p><strong>Date:</strong> <%= @event.date.strftime("%b %d, %Y") %></p>
+    <% end %>
+
+    <% if @event.start_time && @event.end_time %>
+      <p><strong>Time:</strong> <%= @event.start_time.strftime("%I:%M %p") %> – <%= @event.end_time.strftime("%I:%M %p") %></p>
+    <% elsif @event.start_time %>
+      <p><strong>Time:</strong> <%= @event.start_time.strftime("%I:%M %p") %></p>
+    <% end %>
+
+    <% if @event.location.present? %>
+      <p><strong>Location:</strong> <%= @event.location %></p>
+    <% end %>
+
     <% if @event.description.present? %>
       <p><strong>Description:</strong> <%= @event.description %></p>
     <% end %>
-    <% if @event.tags.present? %>
-      <p><strong>Tags:</strong> <%= @event.tags %></p>
+
+    <% if @event.tags.any? %>
+      <p><strong>Tags:</strong> 
+        <% @event.tags.each do |tag| %>
+          <span class="tag" style="background: rgba(40,40,38,0.95); padding: 5px 15px; border-radius: 8px; margin-right: 5px;"><%= tag %></span>
+        <% end %>
+      </p>
     <% end %>
   </div>
-  
-  <div class="actions">
-    <%= link_to "Edit", edit_event_path(@event), class: "btn" %>
-    <%= link_to "Back to Events", events_path, class: "btn" %>
+
+  <!-- Share Link -->
+  <div class="share" style="margin-bottom: 30px;">
+    <p>Share this event:</p>
+    <input type="text" value="<%= request.original_url %>" id="share-link" readonly style="padding: 10px; width: 70%; border-radius: 8px;">
+    <button onclick="copyLink()" style="padding: 10px 20px; border-radius: 8px; margin-left: 10px; cursor: pointer;">Copy Link</button>
   </div>
+
+  <script>
+    function copyLink() {
+      const link = document.getElementById('share-link');
+      link.select();
+      link.setSelectionRange(0, 99999); // for mobile
+      document.execCommand('copy');
+      alert("Event link copied to clipboard!");
+    }
+  </script>
+
+  <!-- Back & Edit Buttons -->
+ <div style="text-align: center; margin-top: 20px;">
+  <% if current_user && current_user.id == @event.user_id %>
+    <%= link_to "Edit", edit_event_path(@event), class: "btn", style: "padding: 12px 30px; border-radius: 12px; background: white; color: #333; font-weight: 600; text-decoration: none;" %>
+  <% end %>
+
+  <%= link_to "Back to Events", events_path, class: "btn", style: "padding: 12px 30px; border-radius: 12px; background: white; color: #333; font-weight: 600; text-decoration: none;" %>
+</div>
+
+
+
 </div>

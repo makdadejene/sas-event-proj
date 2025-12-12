@@ -438,7 +438,7 @@
           <% end %>
 
           <div class="event-info">
-            <h2 class="event-title"><%= event.title %></h2>
+            <h2 class="event-title"><%= link_to event.title, event_path(event), class: "event-title" %></h2>
             <p class="event-description"><%= event.description %></p>
 
             <div class="event-meta">
