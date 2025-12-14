@@ -12,11 +12,25 @@ class Event < ApplicationRecord
   validates :end_time, presence: true
   validate  :end_time_after_start_time 
 
+  # Callbacks
+  before_save :ensure_creator_in_allowed_emails
+
   # Scope for sorting by upvotes
   scope :sorted_by_upvotes, -> { 
     left_joins(:upvotes)
       .group(:id)
       .order('COUNT(upvotes.id) DESC, events.created_at DESC')
+  }
+
+  # Scopes for visibility
+  scope :listed, -> { where(unlisted: [false, nil]) }
+  scope :unlisted_events, -> { where(unlisted: true) }
+  scope :visible_to, ->(user) {
+    if user.present?
+      listed.or(unlisted_events.where("? = ANY(allowed_emails)", user.email.downcase))
+    else
+      listed
+    end
   }
 
   # Get upvote count
@@ -75,12 +89,45 @@ class Event < ApplicationRecord
     end
   end
 
+  # Override allowed_emails getter to ensure it's always an array
+  def allowed_emails
+    super || []
+  end
+
+  # Override allowed_emails setter to handle comma-separated strings
+  def allowed_emails=(value)
+    if value.is_a?(String)
+      super(value.split(',').map { |e| e.strip.downcase }.reject(&:blank?))
+    elsif value.is_a?(Array)
+      super(value.map { |e| e.to_s.strip.downcase }.reject(&:blank?))
+    else
+      super([])
+    end
+  end
+
+  # Check if a user can view this event
+  def visible_to?(user)
+    return true unless unlisted?
+    return false if user.nil?
+    allowed_emails.include?(user.email.downcase)
+  end
 
   def end_time_after_start_time
     return if start_time.blank? || end_time.blank?
 
     if end_time < start_time
       errors.add(:end_time, "can't be earlier than the start time")
+    end
+  end
+
+  private
+
+  # Ensure the creator's email is always in the allowed_emails list for unlisted events
+  def ensure_creator_in_allowed_emails
+    return unless unlisted? && user.present?
+    creator_email = user.email.downcase
+    unless allowed_emails.include?(creator_email)
+      self.allowed_emails = allowed_emails + [creator_email]
     end
   end
 end

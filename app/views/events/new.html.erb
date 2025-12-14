@@ -352,8 +352,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
 
                 <div class="field checkbox-field">
-                    <%= f.check_box :unlisted %>
+                    <%= f.check_box :unlisted, id: 'event_unlisted', onchange: 'toggleAllowedEmails()' %>
                     <%= f.label :unlisted, "Make this event private (unlisted)" %>
+                </div>
+
+                <div class="field" id="allowed-emails-container" style="display: none;">
+                    <%= f.label :allowed_emails, "Invite by Email" %>
+                    <%= f.text_field :allowed_emails, 
+                        placeholder: "email1@example.com, email2@example.com" %>
+                    <small style="color: rgba(255,255,255,0.6); display: block; margin-top: 8px;">
+                        Enter comma-separated email addresses. Your email (<%= current_user.email %>) is automatically included.
+                    </small>
                 </div>
 
                 <div class="actions">
@@ -363,5 +372,13 @@ document.addEventListener("DOMContentLoaded", function() {
             <% end %>
         </div>
     </div>
+
+    <script>
+        function toggleAllowedEmails() {
+            const checkbox = document.getElementById('event_unlisted');
+            const container = document.getElementById('allowed-emails-container');
+            container.style.display = checkbox.checked ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>

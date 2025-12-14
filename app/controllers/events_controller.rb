@@ -1,9 +1,11 @@
 class EventsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_event, only: [:show, :edit, :update, :destroy, :upvote]
+  before_action :authorize_view!, only: [:show]
+  before_action :authorize_edit!, only: [:edit, :update, :destroy]
 
   def index
-    @events = Event.all
+    @events = Event.visible_to(current_user)
 
     # Filter by tags
     if params[:tags].present?
@@ -46,11 +48,8 @@ class EventsController < ApplicationController
   end
 
   def edit
-    @event = Event.find(params[:id])
-    unless @event.user == current_user
-      redirect_to events_path, alert: "You are not authorized to edit this event"
-      return
-    end
+    # @event is already loaded by set_event
+    # Authorization is handled by authorize_edit!
   end
 
   def update
@@ -90,9 +89,18 @@ class EventsController < ApplicationController
     @event = Event.find(params[:id])
   end
 
+  # Ensure the user can view the event (for unlisted events)
+  def authorize_view!
+    unless @event.visible_to?(current_user)
+      redirect_to events_path, alert: "You are not authorized to view this event."
+    end
+  end
+
   # Ensure only the author can edit/update/destroy
-  def authorize_user!
-    redirect_to events_path, alert: "You are not authorized to edit this event" unless @event.user == current_user
+  def authorize_edit!
+    unless @event.user == current_user
+      redirect_to events_path, alert: "You are not authorized to edit this event."
+    end
   end
 
   def event_params
@@ -105,6 +113,7 @@ class EventsController < ApplicationController
       :description,
       :image,
       :unlisted,
+      :allowed_emails,
       tags: []
     )
   end
