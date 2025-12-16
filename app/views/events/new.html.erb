@@ -269,11 +269,32 @@
 
                 <div class="field">
                     <%= f.label :image, "Upload Image" %>
-                    <%= f.file_field :image, accept: "image/*" %>
-                    <small style="color: rgba(255,255,255,0.6); display: block; margin-top: 8px;">
-                        Accepts JPG, PNG. Max size 5MB.
-                    </small>
-                </div>
+                    <%= f.file_field :image, accept: 'image/*', onchange: "previewImage(event)" %>
+                    
+                    <!-- Image Preview -->
+                    <div id="image-preview" style="margin-top: 20px; display: none;">
+                        <img id="preview-img" style="max-width: 400px; max-height: 300px; border-radius: 15px; object-fit: cover;" />
+                    </div>
+                    </div>
+
+                    <script>
+                    function previewImage(event) {
+                        const file = event.target.files[0];
+                        const preview = document.getElementById('image-preview');
+                        const previewImg = document.getElementById('preview-img');
+                        
+                        if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImg.src = e.target.result;
+                            preview.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+                        } else {
+                        preview.style.display = 'none';
+                        }
+                    }
+                    </script>
 
                 <div class="field">
                     <%= f.label :tags, "Tags" %>
