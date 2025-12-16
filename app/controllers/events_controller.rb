@@ -1,6 +1,8 @@
+# app/controllers/events_controller.rb
+
 class EventsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_event, only: [:show, :edit, :update, :destroy, :upvote]
+  before_action :set_event, only: [:show, :edit, :update, :destroy]
   before_action :authorize_view!, only: [:show]
   before_action :authorize_edit!, only: [:edit, :update, :destroy]
 
@@ -23,6 +25,8 @@ class EventsController < ApplicationController
       @events = @events.order(date: :desc)
     when 'upvotes'
       @events = @events.sorted_by_upvotes
+      .group('events.id')
+      .order(Arel.sql('COUNT(upvotes.id) DESC'))
     else
       @events = @events.order(:created_at)
     end
@@ -36,51 +40,74 @@ class EventsController < ApplicationController
     @event = Event.new
   end
 
-  def create
-    @event = Event.new(event_params)
-    @event.user = current_user  # assign the author
-
-    if @event.save
-      redirect_to events_path, notice: 'Event was successfully created.'
-    else
-      render :new, status: :unprocessable_entity
+def authorize_user!
+    unless @event.user_id == current_user&.id
+      flash[:alert] = 'You are not authorized to edit this event'
+      redirect_to events_path
     end
   end
 
-  def edit
-    # @event is already loaded by set_event
-    # Authorization is handled by authorize_edit!
+def create
+  @event = Event.new(event_params)
+  @event.user = current_user
+  
+  if @event.save
+    redirect_to events_path
+  else
+    render :new, status: :unprocessable_entity
   end
+end
 
-  def update
-    # @event is already loaded by set_event
-    if @event.update(event_params)
-      redirect_to event_path(@event), notice: 'Event was successfully updated.'
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
+def edit
 
-  def destroy
-    # @event is already loaded by set_event
-    @event.destroy
-    redirect_to events_path, notice: "Event deleted successfully."
-  end
+end
 
   def upvote
+    @event = Event.find(params[:id])
+    
     unless current_user
-      render json: { error: 'Must be logged in to upvote' }, status: :unauthorized
+      render json: { error: 'Must be logged in' }, status: :unauthorized
       return
     end
 
-    # Toggle the upvote
-    upvoted = @event.toggle_upvote(current_user)
+    result = @event.toggle_upvote(current_user)
     
-    render json: {
-      upvoted: upvoted,
-      upvote_count: @event.upvote_count
+    render json: { 
+      upvote_count: @event.upvote_count,
+      upvoted: result
     }
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Event not found' }, status: :not_found
   end
+
+def update
+  @event = Event.find(params[:id])
+  
+  if @event.user != current_user
+    redirect_to events_path, alert: "You are not authorized to edit this event."
+    return
+  end
+
+  if @event.update(event_params)
+    redirect_to events_path, notice: 'Event was successfully updated.'  # CHANGED FROM event_path(@event)
+  else
+    render :edit, status: :unprocessable_entity
+  end
+end
+
+def destroy
+  @event = Event.find(params[:id])
+  
+  # Check authorization
+  unless @event.user_id == current_user.id
+    flash[:alert] = "You are not authorized to delete this event"
+    redirect_to events_path
+    return
+  end
+  
+  @event.destroy
+  redirect_to events_path, notice: 'Event was successfully deleted.'
+end
 
   private
 
@@ -99,6 +126,7 @@ class EventsController < ApplicationController
   # Ensure only the author can edit/update/destroy
   def authorize_edit!
     unless @event.user == current_user
+      # CHANGE: Update message to match test expectations
       redirect_to events_path, alert: "You are not authorized to edit this event."
     end
   end

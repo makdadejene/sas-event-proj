@@ -4,12 +4,12 @@ Feature: Core Event Management
   I want to manage campus events
   So that I can stay connected with campus activities
 
-  Background: Sample events exist
-    Given the following events exist:
-      | title                     | description                  | date       | time  | tags           |
-      | Soccer Game               | Fun pickup game              | 2025-11-06 | 16:00 | Sports, Other  |
-      | Movie Night               | Watch movies together        | 2025-11-05 | 23:00 | Club, Social   |
-      | Yoga Session              | Morning yoga                 | 2025-11-16 | 08:30 | Sports, Other  |
+Background: Sample events exist
+  Given the following events exist:
+    | title         | description          | date       | time  | location    | tags          |
+    | Soccer Game   | Fun pickup game      | 2026-01-06 | 16:00 | Sports Hall | sports, other |
+    | Movie Night   | Watch movies together| 2026-01-05 | 23:00 | Cinema Room | club, social  |
+    | Yoga Session  | Morning yoga         | 2026-01-16 | 08:30 | Sports Hall | sports, other |
 
   Scenario: View all events on the homepage
     When I visit the events index page
@@ -21,7 +21,7 @@ Feature: Core Event Management
     When I visit the events index page
     Then I should see "Soccer Game"
     And I should see "Fun pickup game"
-    And I should see "Nov 06, 2025"
+    And I should see "Jan 06, 2026"
     And I should see "04:00 PM"
 
   Scenario: Navigate to create event page
@@ -31,15 +31,15 @@ Feature: Core Event Management
     And I should see "Create an event"
 
   Scenario: Successfully create a new event
-    Given I am on the new event page
-    When I fill in "Title" with "Dance Workshop"
-    And I fill in "Description" with "Learn new moves"
-    And I fill in "Date" with "2025-11-20"
-    And I fill in "Time" with "19:00"
-    And I fill in "Tags" with "Club, Other"
-    And I press "Submit"
-    Then I should see "Dance Workshop"
-    And I should see "Learn new moves"
+  Given I am on the new event page
+  When I fill in "Title" with "Dance Workshop"
+  And I fill in "Description" with "Learn new moves"
+  And I fill in "Date" with "2026-01-15"       
+  And I fill in "Start Time" with "14:00"
+  And I fill in "End Time" with "16:00"
+  And I fill in "Location" with "Room 101"       
+  And I press "Submit"
+  Then I should see "Dance Workshop"
 
   Scenario: Sort events alphabetically
     When I visit the events page with sort option "alphabetical"
@@ -63,11 +63,14 @@ Feature: Core Event Management
     And I should see "Social"
 
   Scenario: Create event with minimal information
-    Given I am on the new event page
-    When I fill in "Title" with "Study Session"
-    And I fill in "Date" with "2025-11-25"
-    And I fill in "Time" with "15:00"
-    And I press "Submit"
+  Given I am on the new event page
+  When I fill in "Title" with "Study Session"
+  And I fill in "Date" with "2026-01-20"
+  And I fill in "Start Time" with "10:00"
+  And I fill in "End Time" with "11:00"
+  And I fill in "Location" with "Library"
+  And I press "Submit"
+  Then I should see "Study Session"
     Then I should see "Study Session"
 
   Scenario: Return to event list after creating event

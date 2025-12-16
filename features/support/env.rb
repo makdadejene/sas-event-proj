@@ -4,7 +4,6 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-
 require 'simplecov'
 
 SimpleCov.start 'rails' do
@@ -26,8 +25,19 @@ SimpleCov.start 'rails' do
 end
 
 require 'cucumber/rails'
-require 'rspec/mocks'
 
+# Warden test helpers for authentication
+require 'warden'
+
+World(Warden::Test::Helpers)
+Warden.test_mode!
+
+After do
+  Warden.test_reset!
+end
+
+# RSpec mocks for stubbing and mocking
+require 'rspec/mocks'
 
 World(RSpec::Mocks::ExampleMethods)
 
@@ -42,7 +52,6 @@ After do
     RSpec::Mocks.teardown
   end
 end
-
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -88,3 +97,26 @@ end
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
+
+# Selenium WebDriver configuration for JavaScript tests
+require 'selenium-webdriver'
+
+Capybara.register_driver :selenium_chrome_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--headless')
+  options.add_argument('--disable-gpu')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--disable-dev-shm-usage')
+  
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
+Capybara.javascript_driver = :selenium_chrome_headless
+Capybara.default_max_wait_time = 5
+
+# Clean up database before each test
+Before do
+  Event.delete_all
+  User.delete_all
+  Upvote.delete_all
+end

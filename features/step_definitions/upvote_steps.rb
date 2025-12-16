@@ -48,16 +48,18 @@ When('I click on {string}') do |link_text|
   end
 end
 
-Then('I should see events in this order:') do |table|
-  event_titles = table.raw.flatten
-  
-  # Get all event titles from the page in order
-  page_titles = all('.event-card .event-title').map(&:text)
-  
-  event_titles.each_with_index do |expected_title, index|
-    expect(page_titles[index]).to eq(expected_title)
+Then(/^I should see events in this order:?$/) do |table|
+  expected = table.raw.flatten.map(&:strip)
+
+  actual = all('.event-card').map do |card|
+    titles = card.all('.event-title').map { |el| el.text.strip }.reject(&:empty?)
+    titles.uniq.first
   end
+
+  expect(actual.first(expected.length)).to eq(expected)
 end
+
+
 
 Given('I have upvoted {int} events in the last hour with email {string}') do |count, email|
   count.times do |i|

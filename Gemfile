@@ -48,9 +48,12 @@ end
 # Test only
 # -----------------------------
 group :test do
-  gem "simplecov", require: false
-  gem "selenium-webdriver"
-  gem 'shoulda-matchers', '~> 5.0'
+  gem 'simplecov', require: false
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'cucumber-rails', require: false
+  gem 'database_cleaner'
+  gem 'rspec-rails'
 end
 
 # -----------------------------

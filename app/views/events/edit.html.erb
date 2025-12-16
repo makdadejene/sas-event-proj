@@ -104,10 +104,6 @@
             font-family: inherit;
         }
 
-        select {
-            min-height: 120px;
-        }
-
         .checkbox-field {
             display: flex;
             align-items: center;
@@ -158,14 +154,12 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* Style for date and time inputs */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
         }
 
-        /* Placeholder color */
         ::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
@@ -188,16 +182,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .upload-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .upload-container label:first-child {
-            align-self: flex-start;
-        }
-
         .tags-container {
             display: flex;
             gap: 15px;
@@ -205,30 +189,34 @@
             margin-top: 10px;
         }
 
-        .upload-box {
-            width: 120px;
-            height: 120px;
-            border: 3px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 15px;
+        .tag-checkbox {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.05);
         }
 
-        .upload-box:hover {
-            border-color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.1);
+        .tag-checkbox:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
-        .upload-icon {
-            width: 50px;
-            height: 50px;
-            stroke: white;
-            stroke-width: 2;
-            fill: none;
+        .tag-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .tag-checkbox span {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -251,45 +239,41 @@
 
                 <div class="field">
                     <%= f.label :title, "Title" %>
-                    <%= f.text_field :title, placeholder: "Event name" %>
+                    <%= f.text_field :title, id: 'event_title', placeholder: "Event name" %>
                 </div>
 
                 <div class="field">
                     <%= f.label :date, "Date" %>
-                    <%= f.date_field :date %>
+                    <%= f.date_field :date, id: 'event_date' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :start_time, "Start Time" %>
-                    <%= f.time_field :start_time %>
+                    <%= f.time_field :start_time, id: 'event_start_time' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :end_time, "End Time" %>
-                    <%= f.time_field :end_time %>
+                    <%= f.time_field :end_time, id: 'event_end_time' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :location, "Location" %>
-                    <%= f.text_field :location, placeholder: "Where is this happening?" %>
+                    <%= f.text_field :location, id: 'event_location', placeholder: "Where is this happening?" %>
                 </div>
 
                 <div class="field">
                     <%= f.label :description, "Description" %>
-                    <%= f.text_area :description, placeholder: "Tell us about your event..." %>
+                    <%= f.text_area :description, id: 'event_description', placeholder: "Tell us about your event..." %>
                 </div>
 
-                <div class="field upload-container">
+                <div class="field">
                     <%= f.label :image, "Upload Image" %>
-                    <label for="event_image" class="upload-box">
-                        <svg class="upload-icon" viewBox="0 0 24 24">
-                            <path d="M12 4v12m0-12l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" 
-                                  stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </label>
-                    <%= f.file_field :image, accept: "image/*", id: "event_image", style: "display: none;" %>
+                    <%= f.file_field :image, accept: "image/*" %>
                     <% if @event.image.attached? %>
-                        <small style="color: rgba(255,255,255,0.7); margin-top: 10px; display: block; text-align: center;">Current image attached. Upload a new one to replace it.</small>
+                        <small style="color: rgba(255,255,255,0.7); margin-top: 10px; display: block;">
+                            Current image attached. Upload a new one to replace it.
+                        </small>
                     <% end %>
                 </div>
 
@@ -299,6 +283,14 @@
                         <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'art', @event.tags.include?('art'), id: 'tag_art' %>
                             <span>Art</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'career', @event.tags.include?('career'), id: 'tag_career' %>
+                            <span>Career</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'academic', @event.tags.include?('academic'), id: 'tag_academic' %>
+                            <span>Academic</span>
                         </label>
                         <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'sports', @event.tags.include?('sports'), id: 'tag_sports' %>
@@ -317,6 +309,10 @@
                             <span>Club</span>
                         </label>
                         <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'tech', @event.tags.include?('tech'), id: 'tag_tech' %>
+                            <span>Tech</span>
+                        </label>
+                        <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'other', @event.tags.include?('other'), id: 'tag_other' %>
                             <span>Other</span>
                         </label>
@@ -325,7 +321,7 @@
 
                 <div class="field checkbox-field">
                     <%= f.check_box :unlisted, id: 'event_unlisted', onchange: 'toggleAllowedEmails()' %>
-                    <%= f.label :unlisted, "Make this event private (unlisted)" %>
+                    <%= f.label :unlisted, "Private Event" %>
                 </div>
 
                 <div class="field" id="allowed-emails-container" style="display: <%= @event.unlisted? ? 'block' : 'none' %>;">
@@ -339,11 +335,9 @@
                 </div>
 
                 <div class="actions">
-                    <%= f.submit "Update Event" %>
+                    <%= f.submit "Submit" %>
                     <%= link_to "Cancel", events_path, class: "back-btn" %>
                 </div>
-
-                
             <% end %>
         </div>
     </div>

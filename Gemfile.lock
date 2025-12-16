@@ -129,6 +129,8 @@ GEM
       cucumber (>= 7, < 11)
       railties (>= 6.1, < 9)
     cucumber-tag-expressions (8.0.0)
+    database_cleaner (2.1.0)
+      database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -358,8 +360,6 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
-    shoulda-matchers (5.3.0)
-      activesupport (>= 5.2.0)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -425,6 +425,7 @@ DEPENDENCIES
   bootsnap
   capybara
   cucumber-rails
+  database_cleaner
   database_cleaner-active_record
   debug
   devise
@@ -439,7 +440,6 @@ DEPENDENCIES
   rails-controller-testing
   rspec-rails
   selenium-webdriver
-  shoulda-matchers (~> 5.0)
   simplecov
   sprockets-rails
   stimulus-rails

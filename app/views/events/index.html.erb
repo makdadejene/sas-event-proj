@@ -409,11 +409,11 @@
             <!-- Filter by Tags Section -->
             <div class="filter-section">
               <div class="filter-section-title">Filter by Tags</div>
-              <% ['art', 'sports', 'ed', 'social', 'club', 'other'].each do |tag| %>
+              <% ['art', 'career', 'academic', 'sports', 'ed', 'social', 'club', 'tech', 'other'].each do |tag| %>
                 <label class="filter-option">
                   <input type="checkbox" name="tags[]" value="<%= tag %>" 
-                         <%= 'checked' if params[:tags]&.include?(tag) %>
-                         onchange="this.form.submit()">
+                        <%= 'checked' if params[:tags]&.include?(tag) %>
+                        onchange="this.form.submit()">
                   <span><%= tag.capitalize %></span>
                 </label>
               <% end %>
@@ -425,15 +425,16 @@
 
     <div class="events-grid">
       <% @events.each do |event| %>
-        <div class="event-card">
+        <div class="event-card" id="event_<%= event.id %>">
           <!-- Edit/Delete buttons (only for the author) -->
           <% if current_user && event.user == current_user %>
             <div class="event-actions">
-              <%= link_to "Edit", edit_event_path(event), class: "edit-btn" %>
-              <%= button_to "Delete", event_path(event),
-                  method: :delete,
-                  data: { confirm: "Are you sure?" },
-                  class: "delete-btn" %>
+              <%= link_to 'Delete', event_path(event), 
+                data: { 
+                  turbo_method: :delete, 
+                  turbo_confirm: 'Are you sure?' 
+                },
+                class: 'delete-btn' %>
             </div>
           <% end %>
 
@@ -496,6 +497,6 @@
     </div>
   </div>
 
-  <a href="/events/new" class="add-btn">+</a>
+  <a href="/events/new" class="add-btn" aria-label="Create Event">+</a>
 </body>
 </html>

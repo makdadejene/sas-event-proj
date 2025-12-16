@@ -2,18 +2,25 @@
 
 class Event < ApplicationRecord
   belongs_to :user, optional: true
-  has_many :upvotes, dependent: :destroy
+  has_many :upvotes, dependent: :destroy 
   has_one_attached :image
 
   # Validations
-  validates :title, presence: true
+  validates :title, presence: true, 
+                    length: { minimum: 3, maximum: 100 }
+  validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :date, presence: true
   validates :start_time, presence: true
-  validates :end_time, presence: true
-  validate  :end_time_after_start_time 
+  validates :location, presence: true, length: { minimum: 3 }
+  
+  # Custom validations
+  validate :date_must_be_in_future
+  validate :end_time_after_start_time
+  validate :image_validation 
 
   # Callbacks
   before_save :ensure_creator_in_allowed_emails
+
 
   # Scope for sorting by upvotes
   scope :sorted_by_upvotes, -> { 
@@ -26,12 +33,14 @@ class Event < ApplicationRecord
   scope :listed, -> { where(unlisted: [false, nil]) }
   scope :unlisted_events, -> { where(unlisted: true) }
   scope :visible_to, ->(user) {
-    if user.present?
-      listed.or(unlisted_events.where("? = ANY(allowed_emails)", user.email.downcase))
-    else
-      listed
-    end
-  }
+  if user
+    # Logged in users see: public events + their own unlisted events
+    where(unlisted: [nil, false]).or(where(user: user))
+  else
+    # Logged out users only see public events
+    where(unlisted: [nil, false])
+  end
+}
 
   # Get upvote count
   def upvote_count
@@ -42,7 +51,6 @@ class Event < ApplicationRecord
   def upvoted_by?(user)
     return false if user.nil?
     
-    # For now, just check by email since user_id doesn't exist yet
     if user.is_a?(User)
       upvotes.exists?(email: user.email.downcase)
     elsif user.is_a?(String)
@@ -60,11 +68,9 @@ class Event < ApplicationRecord
     existing_upvote = upvotes.find_by(email: user_email)
     
     if existing_upvote
-      # Remove upvote
       existing_upvote.destroy
       false
     else
-      # Add upvote
       upvotes.create(
         email: user_email,
         username: user.name || user.email
@@ -112,15 +118,38 @@ class Event < ApplicationRecord
     allowed_emails.include?(user.email.downcase)
   end
 
-  def end_time_after_start_time
-    return if start_time.blank? || end_time.blank?
+  private
 
-    if end_time < start_time
-      errors.add(:end_time, "can't be earlier than the start time")
+  # Validate that date is not in the past (allow today and future dates)
+  def date_must_be_in_future
+    if date.present? && date < Date.today
+      errors.add(:date, "must be in the future")
     end
   end
 
-  private
+  # Validate that end_time is after start_time (only if both are present)
+  def end_time_after_start_time
+    return if start_time.blank? || end_time.blank?
+
+    if end_time <= start_time
+      errors.add(:end_time, "must be after start time")
+    end
+  end
+
+  # Validate image attachment
+  def image_validation
+    return unless image.attached?
+
+    # Check file type
+    unless image.content_type.in?(%w[image/jpeg image/jpg image/png])
+      errors.add(:image, "must be a valid image file")
+    end
+
+    # Check file size (5MB = 5 * 1024 * 1024 bytes)
+    if image.byte_size > 5.megabytes
+      errors.add(:image, "file size must be less than 5MB")
+    end
+  end
 
   # Ensure the creator's email is always in the allowed_emails list for unlisted events
   def ensure_creator_in_allowed_emails

@@ -104,10 +104,6 @@
             font-family: inherit;
         }
 
-        select {
-            min-height: 120px;
-        }
-
         .checkbox-field {
             display: flex;
             align-items: center;
@@ -158,14 +154,12 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* Style for date and time inputs */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
         }
 
-        /* Placeholder color */
         ::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
@@ -188,40 +182,41 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .upload-container {
+        .tags-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
         }
 
-        .upload-container label:first-child {
-            align-self: flex-start;
-        }
-
-        .upload-box {
-            width: 120px;
-            height: 120px;
-            border: 3px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 15px;
+        .tag-checkbox {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.05);
         }
 
-        .upload-box:hover {
-            border-color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.1);
+        .tag-checkbox:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
-        .upload-icon {
-            width: 50px;
-            height: 50px;
-            stroke: white;
-            stroke-width: 2;
-            fill: none;
+        .tag-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .tag-checkbox span {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -244,82 +239,41 @@
 
                 <div class="field">
                     <%= f.label :title, "Title" %>
-                    <%= f.text_field :title, placeholder: "Event name" %>
+                    <%= f.text_field :title, id: 'event_title', placeholder: "Event name" %>
                 </div>
 
                 <div class="field">
                     <%= f.label :date, "Date" %>
-                    <%= f.date_field :date %>
+                    <%= f.date_field :date, id: 'event_date' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :start_time, "Start Time" %>
-                    <%= f.time_field :start_time %>
+                    <%= f.time_field :start_time, id: 'event_start_time' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :end_time, "End Time" %>
-                    <%= f.time_field :end_time %>
+                    <%= f.time_field :end_time, id: 'event_end_time' %>
                 </div>
 
                 <div class="field">
                     <%= f.label :location, "Location" %>
-                    <%= f.text_field :location, placeholder: "Where is this happening?" %>
+                    <%= f.text_field :location, id: 'event_location', placeholder: "Where is this happening?" %>
                 </div>
 
                 <div class="field">
                     <%= f.label :description, "Description" %>
-                    <%= f.text_area :description, placeholder: "Tell us about your event..." %>
+                    <%= f.text_area :description, id: 'event_description', placeholder: "Tell us about your event..." %>
                 </div>
-<div class="field upload-container" style="max-width:200px; position:relative;">
-  <!-- Label above the box -->
-  <%= f.label :image, "Upload Image", style: "display:block; color:white; font-weight:600; margin-bottom:10px; text-align:left;" %>
 
-  <label for="event_image" class="upload-box" 
-         style="position:relative; width:200px; height:200px; border:3px dashed #fff; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
-    
-    <!-- SVG placeholder -->
-    <svg id="svg_icon" class="upload-icon" viewBox="0 0 24 24" 
-         style="width:50px; height:50px; stroke:white; stroke-width:2; fill:none; position:absolute;">
-      <path d="M12 4v12m0-12l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" 
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-
-    <!-- Image preview -->
-    <img id="image_preview" src="<%= @event.image.attached? ? url_for(@event.image) : '#' %>" 
-         style="display: <%= @event.image.attached? ? 'block' : 'none' %>; 
-                position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; border-radius:15px;" />
-  </label>
-
-  <%= f.file_field :image, id: "event_image", accept: "image/*", style: "display:none;" %>
-</div>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const input = document.getElementById('event_image');
-  const preview = document.getElementById('image_preview');
-  const svgIcon = document.getElementById('svg_icon');
-
-  if (!input) return console.log("File input not found");
-
-  input.addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (!file) return console.log("No file selected");
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-      if(svgIcon) svgIcon.style.display = 'none';
-      console.log("Preview updated!");
-    };
-    reader.readAsDataURL(file);
-  });
-});
-</script>
-
-
+                <div class="field">
+                    <%= f.label :image, "Upload Image" %>
+                    <%= f.file_field :image, accept: "image/*" %>
+                    <small style="color: rgba(255,255,255,0.6); display: block; margin-top: 8px;">
+                        Accepts JPG, PNG. Max size 5MB.
+                    </small>
+                </div>
 
                 <div class="field">
                     <%= f.label :tags, "Tags" %>
@@ -327,6 +281,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'art', false, id: 'tag_art' %>
                             <span>Art</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'career', false, id: 'tag_career' %>
+                            <span>Career</span>
+                        </label>
+                        <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'academic', false, id: 'tag_academic' %>
+                            <span>Academic</span>
                         </label>
                         <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'sports', false, id: 'tag_sports' %>
@@ -345,6 +307,10 @@ document.addEventListener("DOMContentLoaded", function() {
                             <span>Club</span>
                         </label>
                         <label class="tag-checkbox">
+                            <%= check_box_tag 'event[tags][]', 'tech', false, id: 'tag_tech' %>
+                            <span>Tech</span>
+                        </label>
+                        <label class="tag-checkbox">
                             <%= check_box_tag 'event[tags][]', 'other', false, id: 'tag_other' %>
                             <span>Other</span>
                         </label>
@@ -353,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <div class="field checkbox-field">
                     <%= f.check_box :unlisted, id: 'event_unlisted', onchange: 'toggleAllowedEmails()' %>
-                    <%= f.label :unlisted, "Make this event private (unlisted)" %>
+                    <%= f.label :unlisted, "Private Event" %>
                 </div>
 
                 <div class="field" id="allowed-emails-container" style="display: none;">

@@ -6,9 +6,9 @@ Feature: Upvote Events
   Background:
     Given the following events exist:
       | title           | description        | date       | time  | location      | tags    |
-      | Tech Talk       | AI Workshop        | 2025-12-01 | 14:00 | CS Building   | Tech    |
-      | Career Fair     | Job Opportunities  | 2025-12-05 | 10:00 | Student Union | Career  |
-      | Music Concert   | Live Performance   | 2025-12-10 | 19:00 | Auditorium    | Social  |
+      | Tech Talk       | AI Workshop        | 2026-01-15 | 14:00 | CS Building   | Tech    |
+      | Career Fair     | Job Opportunities  | 2026-01-20 | 10:00 | Student Union | Career  |
+      | Music Concert   | Live Performance   | 2026-01-25 | 19:00 | Auditorium    | Social  |
 
   Scenario: Student upvotes an event
     Given I visit the events index page

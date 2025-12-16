@@ -31,7 +31,7 @@ RSpec.describe User, type: :model do
 
     it 'destroys associated events when destroyed' do
       user = User.create!(email: 'test@example.com', password: 'password123', password_confirmation: 'password123')
-      event = user.events.create!(title: 'Test Event', date: Date.today, start_time: '18:00')
+      event = user.events.create!(title: 'Test Event', date: Date.today, start_time: '18:00', location: 'Test Location')
       
       expect { user.destroy }.to change { Event.count }.by(-1)
     end
