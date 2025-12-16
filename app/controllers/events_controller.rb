@@ -98,17 +98,14 @@ end
 def destroy
   @event = Event.find(params[:id])
   
-  # Check authorization
-  unless @event.user_id == current_user.id
-    flash[:alert] = "You are not authorized to delete this event"
-    redirect_to events_path
-    return
+  # Optional: Check if current user is the owner
+  if current_user && @event.user == current_user
+    @event.destroy
+    redirect_to events_path, notice: 'Event was successfully deleted.'
+  else
+    redirect_to events_path, alert: 'You are not authorized to delete this event.'
   end
-  
-  @event.destroy
-  redirect_to events_path, notice: 'Event was successfully deleted.'
 end
-
   private
 
   # Load event for actions that need it
