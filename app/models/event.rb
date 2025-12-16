@@ -97,7 +97,7 @@ class Event < ApplicationRecord
 
   # Override allowed_emails getter to ensure it's always an array
   def allowed_emails
-    super || []
+    self[:allowed_emails] || []
   end
 
   # Override allowed_emails setter to handle comma-separated strings
