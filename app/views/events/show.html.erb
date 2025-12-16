@@ -68,8 +68,12 @@
   <!-- Share Link -->
   <div class="share" style="margin-bottom: 30px;">
     <p>Share this event:</p>
-    <input type="text" value="<%= request.original_url %>" id="share-link" readonly style="padding: 10px; width: 70%; border-radius: 8px; color: #333;">
-    <button onclick="copyLink()" style="padding: 10px 20px; border-radius: 8px; margin-left: 10px; cursor: pointer; background: white; border: none;">Copy Link</button>
+    <input type="text" value="<%= request.original_url %>" id="share-link" readonly 
+          style="padding: 10px; width: 70%; border-radius: 8px; color: #333; background: white; border: none;">
+    <button onclick="copyLink()" 
+            style="padding: 10px 20px; border-radius: 8px; margin-left: 10px; cursor: pointer; background: white; border: none; color: #333; font-weight: 600;">
+      Copy Link
+    </button>
   </div>
 
   <script>
