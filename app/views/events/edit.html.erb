@@ -402,20 +402,30 @@
         }
 
         function previewImage(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('image-preview');
-            const previewImg = document.getElementById('preview-img');
+    const file = event.target.files[0];
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const uploadArea = document.querySelector('.upload-area');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
             
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.style.display = 'block';
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
+            // Hide the upload area once image is selected
+            if (uploadArea) {
+                uploadArea.style.display = 'none';
             }
         }
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+        if (uploadArea) {
+            uploadArea.style.display = 'block';
+        }
+    }
+}
     </script>
 </body>
 </html>
